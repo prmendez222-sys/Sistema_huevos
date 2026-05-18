@@ -207,3 +207,63 @@ class Venta
         EstadoVenta= estadoventa;
     }
 }
+class DetalleVenta
+{
+    private int id;
+    private int ventaid;
+    private int productoid;
+    private int cantidad;
+    private double preciounitario;
+    private double subtotal;
+
+    public DetalleVenta(int id, int ventaid, int productoid, int cantidad, double preciounitario, double subtotal)
+    {
+        ID= id;
+        VentaID= ventaid;
+        ProductoID= productoid;
+        Cantidad= cantidad;
+        PrecioUnitario= preciounitario;
+        SubTotal= subtotal;
+    }
+
+    public double SubTotal
+    {
+        get { return subtotal; }
+        set { subtotal = value; }
+    }
+
+
+    public double PrecioUnitario
+    { 
+        get { return preciounitario; }
+        set { preciounitario = value; }
+    }
+
+
+    public int Cantidad
+    {
+        get { return cantidad; }
+        set { cantidad = value; }
+    }
+
+
+    public int ProductoID
+    {
+        get { return productoid; }
+        set { productoid = value; }
+    }
+
+    public int VentaID
+    {
+        get { return ventaid; }
+        set { ventaid = value; }
+    }
+
+
+    public int ID
+    {
+        get { return id; }
+        set { id = value; }
+    }
+
+}
