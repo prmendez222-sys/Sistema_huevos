@@ -1,4 +1,16 @@
-﻿class Producto
+﻿public enum TipoCliente
+{
+    Frecuente,
+    Credito
+}
+
+public enum EstadoVenta
+{
+    Pagada,
+    Parcial,
+    Pendiente
+}
+class Producto
 {
     private int id;
     private string nombre="vacio";
@@ -9,7 +21,7 @@
     private int unidadesPorcaja;
     private int stockactual;
 
-    public Producto(int id, string nombre, double costoUnitario, double costoPorCaja, double precioUnitario, double precioporCaja, int unidadesPorCaja, int stockactual)
+    public Producto(int id, string nombre, double costoUnitario, double costoPorCaja, double precioUnitario, double precioporCaja, int unidadesPorCaja)
     {
         ID = id;
         Nombre = nombre;
@@ -79,8 +91,17 @@ class Cliente
     private int id;
     private string nombre="vacio";
     private string telefono="";
-    private string tipo="";
+    private TipoCliente tipo;
     private DateTime fecharegistro;
+
+    public Cliente(int iD, string nombre, string telefono, TipoCliente tipo)
+    {
+        ID = iD;
+        Nombre = nombre;
+        Telefono = telefono;
+        Tipo = tipo;
+        FechaRegistro = DateTime.Now;
+    }
 
     public int ID
     {
@@ -100,7 +121,7 @@ class Cliente
         set { telefono = value; }
     }
 
-    public string Tipo
+    public TipoCliente Tipo
     {
         get { return tipo; }
         set { tipo = value; }
@@ -110,5 +131,79 @@ class Cliente
     {
         get { return fecharegistro; }
         set {  fecharegistro = value; }
+    }
+}
+class Venta
+{
+    private int id;
+    private DateTime fecha;
+    private int? clienteId;
+    private List<DetalleVenta> detalles;
+    private double total;
+    private bool escredito;
+    private double montopagado;
+    private double saldo;
+    private EstadoVenta estadoventa;
+
+    public int ID
+    {
+        get { return id; }
+        set { id= value; }
+    }
+    public DateTime Fecha
+    {
+        get { return fecha; }
+        set { fecha = value; }
+    }
+
+    public int? ClienteID
+    {
+        get { return clienteId; }
+        set {  clienteId= value; }
+    }
+
+    public List<DetalleVenta> Detalles
+    {
+        get { return detalles; }
+        set {  detalles = value; }
+    }
+
+    public double Total
+    {
+        get { return total; }
+        set {  total = value; }
+    }
+    public bool Escredito
+    {
+        get { return escredito; }
+        set {  escredito = value; }
+    }
+    public double Montopagado
+    {
+        get { return montopagado; }
+        set {  montopagado = value; }
+    }
+    public double Saldo
+    {
+        get { return saldo; }
+        set {  saldo = value; }
+    }
+    public EstadoVenta EstadoVenta
+    {
+        get { return estadoventa; }
+        set {  estadoventa = value; }
+    }
+
+    public Venta(int id, int? idcliente,List<DetalleVenta> detalles, double total, bool escredito, double montopagado,double saldo, EstadoVenta estadoventa)
+    {
+        ID= id;
+        Fecha = DateTime.Now;
+        ClienteID= idcliente;
+        Detalles= detalles;
+        Total = total;
+        Escredito= escredito;
+        Montopagado= montopagado;
+        Saldo= saldo;
+        EstadoVenta= estadoventa;
     }
 }
