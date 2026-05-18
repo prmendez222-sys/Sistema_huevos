@@ -1,4 +1,15 @@
-﻿public enum TipoCliente
+﻿public enum EstadoCredito
+{
+    Activo,
+    Pagado,
+    Vencido
+}
+public enum FechaLimite
+{
+    quinceDias=15,
+    treintaDias=30
+}
+public enum TipoCliente
 {
     Frecuente,
     Credito
@@ -266,4 +277,72 @@ class DetalleVenta
         set { id = value; }
     }
 
+}
+class Credito
+{
+    private int id;
+    private int clienteid;
+    private int ventaid;
+    private double montoOriginal;
+    private double montopendiente;
+    private DateTime fechaotorgado;
+    private DateTime fechalimite;
+    private EstadoCredito estado;
+
+    public Credito(int iD, int clienteID, int ventaID, double montoOriginal, double mtopendiente, int diasplazo, EstadoCredito estado)
+    {
+        ID = iD;
+        ClienteID = clienteID;
+        VentaID = ventaID;
+        MontoOriginal = montoOriginal;
+        Mtopendiente = mtopendiente;
+        Fechaotorgado = DateTime.Now;
+        FechaLimite = DateTime.Now.AddDays(diasplazo);
+        Estado = estado;
+    }
+
+    public int ID
+    {
+        get { return id; }
+        set { id= value; }
+    }
+
+    public int ClienteID
+    {
+        get { return clienteid; }
+        set { clienteid= value; }
+    }
+
+    public int VentaID
+    {
+        get { return ventaid; }
+        set { ventaid= value; }
+    }
+
+    public double MontoOriginal
+    {
+        get { return montoOriginal; }
+        set { montoOriginal = value; }
+    }
+
+    public double Mtopendiente
+    {
+        get { return montopendiente; }
+        set { montopendiente = value; }
+    }
+    public DateTime Fechaotorgado
+    {
+        get { return fechaotorgado; }
+        set {  fechaotorgado = value; }
+    }
+    public DateTime FechaLimite
+    {
+        get { return fechalimite; }
+        set { fechalimite = value; }
+    }
+    public EstadoCredito Estado
+    {
+        get { return estado; }
+        set {  estado = value; }
+    }
 }
