@@ -1,4 +1,11 @@
-﻿public enum EstadoCredito
+﻿public enum TipoPerdida
+{
+    Roto,
+    Vencido,
+    Danado,
+    otro
+}
+public enum EstadoCredito
 {
     Activo,
     Pagado,
@@ -345,4 +352,187 @@ class Credito
         get { return estado; }
         set {  estado = value; }
     }
+}
+
+class Pago
+{
+    private int id;
+    private int clienteid;
+    private double monto;
+    private DateTime fecha;
+
+    public Pago(int iD, int clienteid, double monto)
+    {
+        ID = iD;
+        Clienteid = clienteid;
+        Monto = monto;
+        Fecha = DateTime.Now;
+    }
+
+    public int ID
+    {
+        get { return id; }
+        set {  id = value; }
+    }
+
+    public int Clienteid
+    {
+        get { return clienteid; }
+        set {  clienteid = value; }
+    }
+    public double Monto
+    {
+        get { return monto; }
+        set { monto = value; }
+    }
+    public DateTime Fecha
+    {
+        get { return fecha; }
+        set { fecha = value; }
+    }
+}
+
+class Gasto
+{
+    private int id;
+    private string descripcion = "";
+    private DateTime fecha;
+
+    public int ID
+    {
+        get { return id; }
+        set {  ID = value; }
+    }
+    public string Descripcion
+    {
+        get { return descripcion; }
+        set {  descripcion = value; }
+    }
+    public DateTime Fecha
+    {
+        get { return fecha; }
+        set { fecha = value; }
+    }
+}
+
+class Perdida
+{
+    private int id;
+    private int productoid;
+    private int cantidad;
+    private double costounitario;
+    private double totalperdido;
+    private TipoPerdida tipoperdida;
+    private DateTime fecha;
+
+    public Perdida(int iD, int productoID, int cantidad, double costounitario, double totalPerdido, TipoPerdida perdida)
+    {
+        ID = iD;
+        ProductoID = productoID;
+        Cantidad = cantidad;
+        Costounitario = costounitario;
+        TotalPerdido = totalPerdido;
+        TipoPerdida = perdida;
+        Fecha = DateTime.Now;
+    }
+
+    public int ID
+    {
+        get { return id; }
+        set {  id = value; }
+    }
+    public int ProductoID
+    {
+        get { return productoid; }
+        set {  productoid = value; }
+    }
+    public int Cantidad
+    {
+        get { return cantidad; }
+        set {  cantidad = value; }
+    }
+    public double Costounitario
+    {
+        get { return costounitario; }
+        set {  costounitario = value; }
+    }
+    public double TotalPerdido
+    {
+        get { return totalperdido; }
+        set { totalperdido = value; }
+    }
+    public TipoPerdida TipoPerdida
+    {
+        get { return tipoperdida;}
+        set { tipoperdida = value; }
+    }
+    public DateTime Fecha
+    {
+        get { return fecha; }
+        set { fecha = value; }
+    }
+}
+
+class ReporteFinanciero
+{
+    private DateTime fechainicio;
+    private DateTime fechafin;
+    private double totalventas;
+    private double totalgastos;
+    private double totalperdido;
+    private double totalcreditosvencidos;
+    private double perdidastotales;
+    private double ganacias;
+
+    public ReporteFinanciero(DateTime fechaInicio, DateTime fechaFin, double totalVentas, double totalGastos, double totalPerdido, double totalCreditosVencidos)
+    {
+        FechaInicio = fechaInicio;
+        FechaFin = fechaFin;
+        TotalVentas = totalVentas;
+        TotalGastos = totalGastos;
+        TotalPerdido = totalPerdido;
+        TotalCreditosVencidos = totalCreditosVencidos;
+    }
+
+    public DateTime FechaInicio
+    {
+        get { return fechainicio;  }
+        set { fechainicio = value; }
+    }
+    public DateTime FechaFin
+    {
+        get { return fechafin; }
+        set { fechafin = value; }
+    }
+    public double TotalVentas
+    {
+        get { return totalventas; }
+        set { totalventas = value; }
+    }
+    public double TotalGastos
+    {
+        get { return totalgastos; }
+        set { totalgastos = value; }
+    }
+    public double TotalPerdido
+    {
+        get { return totalperdido; }
+        set { totalperdido = value; }
+    }
+    public double TotalCreditosVencidos
+    {
+        get { return totalcreditosvencidos; }
+        set { totalcreditosvencidos = value; }
+    }
+    public double PerdidadTotales
+    {
+        get { return perdidastotales; }
+        set {  perdidastotales = value; }
+    }
+    public double Ganacias
+    {
+        get { return ganacias; }
+        set {  ganacias = value; }
+    }
+
 }
