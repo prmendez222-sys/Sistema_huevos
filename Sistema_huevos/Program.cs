@@ -32,7 +32,7 @@ public enum EstadoVenta
 class Producto
 {
     private int id;
-    private string nombre="vacio";
+    private string nombre = "vacio";
     private double costoUnitario;
     private double costoPorcaja;
     private double precioUnitario;
@@ -40,7 +40,7 @@ class Producto
     private int unidadesPorcaja;
     private int stockactual;
 
-    public Producto(int id, string nombre, double costoUnitario,double precioUnitario)
+    public Producto(int id, string nombre, double costoUnitario, double precioUnitario)
     {
         ID = id;
         Nombre = nombre;
@@ -60,8 +60,8 @@ class Producto
 
     public string Nombre
     {
-        get { return nombre;}
-        set 
+        get { return nombre; }
+        set
         {
             if (string.IsNullOrEmpty(value)) throw new Exception("El Nombre no puede quedar vacio");
             else nombre = value;
@@ -70,8 +70,8 @@ class Producto
 
     public double CostoUnitario
     {
-        get { return costoUnitario;}
-        set 
+        get { return costoUnitario; }
+        set
         {
             if (value <= 0) throw new Exception("el costo debe ser mayor a cero");
             else costoUnitario = value;
@@ -80,14 +80,14 @@ class Producto
 
     public double CostoPorCaja
     {
-        get { return costoPorcaja;}
-        set {  costoPorcaja = value; }
+        get { return costoPorcaja; }
+        set { costoPorcaja = value; }
     }
 
     public double PrecioUnitario
     {
-        get { return precioUnitario;}
-        set 
+        get { return precioUnitario; }
+        set
         {
             if (value <= 0) throw new Exception("el precio debe ser mayor a cero");
             else precioUnitario = value;
@@ -96,20 +96,20 @@ class Producto
 
     public double PrecioporCaja
     {
-        get { return precioPorcaja;}
+        get { return precioPorcaja; }
         set { precioPorcaja = value; }
     }
 
     public int UnidadesPorCaja
     {
         get { return unidadesPorcaja; }
-        set {  unidadesPorcaja = value; }
+        set { unidadesPorcaja = value; }
     }
 
     public int Stockactual
     {
         get { return stockactual; }
-        set 
+        set
         {
             if (stockactual < 0) throw new Exception("el stock no puede ser menor a cero");
             else stockactual = value;
@@ -120,6 +120,20 @@ class Producto
         stockactual += nuevoStock;
     }
 
+    public void ModificarNombre(string nombre)
+    {
+        Nombre = nombre;
+    }
+
+    public void Modificarcosto(double nuevoCosto)
+    {
+        CostoUnitario = nuevoCosto;
+    }
+
+    public void ModificarPrecio(double nuevoPrecio)
+    {
+        PrecioUnitario= nuevoPrecio;
+    }
     public void MostrarInfo()
     {
         Console.WriteLine("ID producto: "+ID);
@@ -575,7 +589,7 @@ class Program
 
         Dictionary<int,Producto> productos= new Dictionary<int,Producto>();
 
-        string opcion;
+        string opcion; bool error;
         do
         {
             Console.WriteLine("====MENU====");
@@ -587,7 +601,9 @@ class Program
             Console.WriteLine("5. Gastos");
             Console.WriteLine("6. perdidas");
             Console.WriteLine("7. Reportes");
+            Console.ForegroundColor= ConsoleColor.Red;
             Console.WriteLine("8. Salir");
+            Console.ResetColor();
             Console.WriteLine();
             Console.Write("Ingrese una opcion: ");
             opcion= Console.ReadLine();
@@ -601,17 +617,19 @@ class Program
                         Console.WriteLine("====Productos====");
                         Console.WriteLine();
                         Console.WriteLine("1. Registrar Producto");
-                        Console.WriteLine("2. Actualizar Stock");
+                        Console.WriteLine("2. modificar datos de producto");
                         Console.WriteLine("3. ver todos los productos");
                         Console.WriteLine("4. Buscar producto");
+                        Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("5. Volver al MENU");
+                        Console.ResetColor();
                         Console.WriteLine();
                         Console.Write("Ingrese una opcion: "); opcion= Console.ReadLine();
                         Console.Clear();
                         switch (opcion)
                         {
                             case "1":
-                                bool error; int ID = 0;
+                                int ID = 1;
                                 do
                                 {
                                     Console.Write("Ingrese Nombre del Producto: "); string nombre= Console.ReadLine();
@@ -637,7 +655,10 @@ class Program
                                         Producto p1 = new Producto(ID,nombre,costounitario,preciounitario);
                                         productos.Add(ID,p1);
                                         ID++;
+                                        Console.WriteLine();
+                                        Console.ForegroundColor= ConsoleColor.Green;
                                         Console.WriteLine("Producto Ingresado con Exito");
+                                        Console.ResetColor();
                                         Presionar();
                                         Console.Clear();
                                         error = true;
@@ -653,24 +674,87 @@ class Program
                                 } while (!error);
                                 break;
                             case "2":
+                                string sub3;
                                 if(productos.Count == 0)
                                 {
+                                    Console.ForegroundColor= ConsoleColor.Yellow;
                                     Console.WriteLine("no hay productos registrados");
+                                    Console.ResetColor();
+                                    Presionar();
                                 }
                                 else
                                 {
-                                    bool correcto; int IDp;
+                                    int IDp;
                                     do
                                     { 
                                         Console.Write("ingrese ID de Producto: ");
-                                        correcto=int.TryParse(Console.ReadLine(),out IDp);
-                                    } while (!correcto);
+                                        error=int.TryParse(Console.ReadLine(),out IDp);
+                                    } while (!error);
 
                                     if (productos.ContainsKey(IDp))
                                     {
+                                     
+                                        do
+                                        {
+                                            Console.WriteLine();
+                                            productos[IDp].MostrarInfo();
+                                            Console.WriteLine();
+                                            Console.WriteLine("1. Modificar Nombre del Producto");
+                                            Console.WriteLine("2. modificar Costo unitario");
+                                            Console.WriteLine("3. modificar Precio unitario");
+                                            Console.WriteLine("4. modificar Stock Actual");
+                                            Console.ForegroundColor = ConsoleColor.Red;
+                                            Console.WriteLine("5. Volver a PRODUCTOS");
+                                            Console.ResetColor();
+                                            Console.WriteLine();
+                                            Console.Write("Ingrese una opcion: "); sub3 = Console.ReadLine();
+                                            Console.Clear();
+                                            switch (sub3)
+                                            {
+                                                case "1":
+                                                    do
+                                                    {
+                                                        try
+                                                        {
+                                                            Console.Write("Ingrese el nombre nuevo: ");
+                                                            productos[IDp].ModificarNombre(Console.ReadLine());
+                                                            Console.WriteLine();
+                                                            Console.ForegroundColor=ConsoleColor.Green;
+                                                            Console.WriteLine("Nombre modificado con exito");
+                                                            Console.ResetColor();
+                                                            Presionar();
+                                                            error = true;
+                                                            Console.Clear();
+                                                        }
+                                                        catch (Exception ex)
+                                                        {
+                                                            Console.WriteLine(ex.Message);
+                                                            Presionar();
+                                                            Console.Clear();
+                                                            error = false;
+                                                        }
+                                                    } while (!error);
+                                                    break;
+                                                case "2":
+
+                                                    break;
+                                            }
+                                        } while (sub3 != "5");
+                                    }
+                                    else
+                                    {
                                         Console.WriteLine();
-                                        productos[IDp].MostrarInfo();
-                                        Presionar();
+                                        Console.ForegroundColor= ConsoleColor.Yellow;
+                                        Console.WriteLine("Producto no encontrado");
+                                        Console.WriteLine();
+                                        Console.Write("volviendo a PRODUCTOS");
+                                        Console.Write(".");
+                                        Thread.Sleep(1000);
+                                        Console.Write(".");
+                                        Thread.Sleep(1000);
+                                        Console.Write(".");
+                                        Thread.Sleep(1000);
+                                        Console.ResetColor();
                                     }
                                 }
                                 break;
