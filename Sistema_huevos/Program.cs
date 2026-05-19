@@ -1,4 +1,5 @@
-﻿public enum TipoPerdida
+﻿
+public enum TipoPerdida
 {
     Roto,
     Vencido,
@@ -39,15 +40,15 @@ class Producto
     private int unidadesPorcaja;
     private int stockactual;
 
-    public Producto(int id, string nombre, double costoUnitario, double costoPorCaja, double precioUnitario, double precioporCaja, int unidadesPorCaja)
+    public Producto(int id, string nombre, double costoUnitario,double precioUnitario)
     {
         ID = id;
         Nombre = nombre;
         CostoUnitario = costoUnitario;
-        CostoPorCaja = costoPorCaja;
         PrecioUnitario = precioUnitario;
-        PrecioporCaja = precioporCaja;
-        UnidadesPorCaja = unidadesPorCaja;
+        CostoPorCaja = costoUnitario * 12;
+        PrecioporCaja = precioUnitario * 12;
+        UnidadesPorCaja = 12;
         Stockactual = 0;
     }
 
@@ -62,7 +63,7 @@ class Producto
         get { return nombre;}
         set 
         {
-            if (string.IsNullOrEmpty(nombre)) throw new Exception("Nombre no puede quedar vacio");
+            if (string.IsNullOrEmpty(value)) throw new Exception("El Nombre no puede quedar vacio");
             else nombre = value;
         }
     }
@@ -70,7 +71,11 @@ class Producto
     public double CostoUnitario
     {
         get { return costoUnitario;}
-        set { costoUnitario = value; }
+        set 
+        {
+            if (value <= 0) throw new Exception("el costo debe ser mayor a cero");
+            else costoUnitario = value;
+        }
     }
 
     public double CostoPorCaja
@@ -82,7 +87,11 @@ class Producto
     public double PrecioUnitario
     {
         get { return precioUnitario;}
-        set { precioUnitario = value; }
+        set 
+        {
+            if (value <= 0) throw new Exception("el precio debe ser mayor a cero");
+            else precioUnitario = value;
+        }
     }
 
     public double PrecioporCaja
@@ -100,7 +109,24 @@ class Producto
     public int Stockactual
     {
         get { return stockactual; }
-        set { stockactual = value; }
+        set 
+        {
+            if (stockactual < 0) throw new Exception("el stock no puede ser menor a cero");
+            else stockactual = value;
+        }
+    }
+    public void ActualizarStock(int nuevoStock)
+    {
+        stockactual += nuevoStock;
+    }
+
+    public void MostrarInfo()
+    {
+        Console.WriteLine("ID producto: "+ID);
+        Console.WriteLine("Nombre del Producto: " + Nombre);
+        Console.WriteLine("Costo Unitario: "+CostoUnitario);
+        Console.WriteLine("Precio unitario: "+PrecioUnitario);
+        Console.WriteLine("Stock actual: "+Stockactual);
     }
 }
 
@@ -534,5 +560,125 @@ class ReporteFinanciero
         get { return ganacias; }
         set {  ganacias = value; }
     }
+}
 
+class Program
+{
+    static void Main()
+    {
+        void Presionar()
+        {
+            Console.WriteLine();
+            Console.WriteLine("Presione Enter para continuar");
+            Console.ReadLine();
+        }
+
+        Dictionary<int,Producto> productos= new Dictionary<int,Producto>();
+
+        string opcion;
+        do
+        {
+            Console.WriteLine("====MENU====");
+            Console.WriteLine();
+            Console.WriteLine("1. Productos");
+            Console.WriteLine("2. Clientes");
+            Console.WriteLine("3. ventas");
+            Console.WriteLine("4. Creditos");
+            Console.WriteLine("5. Gastos");
+            Console.WriteLine("6. perdidas");
+            Console.WriteLine("7. Reportes");
+            Console.WriteLine("8. Salir");
+            Console.WriteLine();
+            Console.Write("Ingrese una opcion: ");
+            opcion= Console.ReadLine();
+            Console.Clear();
+
+            switch (opcion)
+            {
+                case "1":
+                    do
+                    {
+                        Console.WriteLine("====Productos====");
+                        Console.WriteLine();
+                        Console.WriteLine("1. Registrar Producto");
+                        Console.WriteLine("2. Actualizar Stock");
+                        Console.WriteLine("3. ver todos los productos");
+                        Console.WriteLine("4. Buscar producto");
+                        Console.WriteLine("5. Volver al MENU");
+                        Console.WriteLine();
+                        Console.Write("Ingrese una opcion: "); opcion= Console.ReadLine();
+                        Console.Clear();
+                        switch (opcion)
+                        {
+                            case "1":
+                                bool error; int ID = 0;
+                                do
+                                {
+                                    Console.Write("Ingrese Nombre del Producto: "); string nombre= Console.ReadLine();
+                                    Console.WriteLine();
+
+                                    double costounitario;
+                                    do
+                                    {
+                                        Console.Write("ingrese el costo Unitario: ");
+                                        error = double.TryParse(Console.ReadLine(),out costounitario);
+                                    } while (!error);
+                                    Console.WriteLine();
+
+                                    double preciounitario;
+                                    do
+                                    {
+                                        Console.Write("ingrese el precio de consumidor: ");
+                                        error = double.TryParse(Console.ReadLine(), out preciounitario);
+                                    } while (!error);
+
+                                    try
+                                    {
+                                        Producto p1 = new Producto(ID,nombre,costounitario,preciounitario);
+                                        productos.Add(ID,p1);
+                                        ID++;
+                                        Console.WriteLine("Producto Ingresado con Exito");
+                                        Presionar();
+                                        Console.Clear();
+                                        error = true;
+                                    }
+                                    catch(Exception ex)
+                                    {
+                                        Console.WriteLine(ex.Message);
+                                        error = false;
+                                        Presionar();
+                                        Console.Clear();
+                                    }
+
+                                } while (!error);
+                                break;
+                            case "2":
+                                if(productos.Count == 0)
+                                {
+                                    Console.WriteLine("no hay productos registrados");
+                                }
+                                else
+                                {
+                                    bool correcto; int IDp;
+                                    do
+                                    { 
+                                        Console.Write("ingrese ID de Producto: ");
+                                        correcto=int.TryParse(Console.ReadLine(),out IDp);
+                                    } while (!correcto);
+
+                                    if (productos.ContainsKey(IDp))
+                                    {
+                                        Console.WriteLine();
+                                        productos[IDp].MostrarInfo();
+                                        Presionar();
+                                    }
+                                }
+                                break;
+                        }
+                        Console.Clear();
+                    } while (opcion != "5");
+                    break;
+            }
+        } while (opcion!="8");
+    }
 }
