@@ -1,4 +1,6 @@
 ﻿
+using System.Runtime.CompilerServices;
+
 public enum TipoPerdida
 {
     Roto,
@@ -148,11 +150,11 @@ class Cliente
 {
     private int id;
     private string nombre="vacio";
-    private string telefono="";
+    private int telefono;
     private TipoCliente tipo;
     private DateTime fecharegistro;
 
-    public Cliente(int iD, string nombre, string telefono, TipoCliente tipo)
+    public Cliente(int iD, string nombre, int telefono, TipoCliente tipo)
     {
         ID = iD;
         Nombre = nombre;
@@ -170,13 +172,21 @@ class Cliente
     public string Nombre
     {
         get { return nombre; }
-        set {  nombre = value; }
+        set 
+        {
+            if (string.IsNullOrEmpty(value)) throw new Exception("el nombre no puede quedar vacio");
+            else nombre = value;
+        }
     }
 
-    public string Telefono
+    public int Telefono
     {
         get { return telefono; }
-        set { telefono = value; }
+        set 
+        {
+            if (value.ToString().Count() == 8) telefono = value;
+            else throw new Exception("numero de telefono no valido");
+        }
     }
 
     public TipoCliente Tipo
@@ -189,6 +199,29 @@ class Cliente
     {
         get { return fecharegistro; }
         set {  fecharegistro = value; }
+    }
+
+    public void MostrarInfo()
+    {
+        Console.WriteLine("ID cliente: "+ID);
+        Console.WriteLine("Nombre del cliente: "+Nombre);
+        Console.WriteLine("Numero de Telefono: "+Telefono);
+        Console.WriteLine("Tipo de Cliente: "+Tipo);
+        Console.WriteLine("Fecha de Registro: "+FechaRegistro);
+    }
+
+    public void ModificarNombre(string nuevonombre)
+    {
+        Nombre = nuevonombre;
+    }
+
+    public void ModificarNumero(int numero)
+    {
+        Telefono= numero;
+    }
+    public void ModificarTipo(TipoCliente nuevotipo)
+    {
+        Tipo = nuevotipo;
     }
 }
 class Venta
@@ -588,8 +621,9 @@ class Program
         }
 
         Dictionary<int,Producto> productos= new Dictionary<int,Producto>();
+        Dictionary<int,Cliente> clientes= new Dictionary<int,Cliente>();
 
-        string opcion; bool error; int IDproducto = 1;
+        string opcion; bool error; int IDproducto = 1, IDcliente=1; 
         do
         {
             Console.WriteLine("====MENU====");
@@ -932,14 +966,7 @@ class Program
                                                     Console.ForegroundColor= ConsoleColor.Yellow;
                                                     Console.WriteLine("Producto no encontrado");
                                                     Console.WriteLine();
-                                                    Console.Write("volviendo a BUSCAR PRODUCTOS");
-                                                    Console.Write(".");
-                                                    Thread.Sleep(1000);
-                                                    Console.Write(".");
-                                                    Thread.Sleep(1000);
-                                                    Console.Write(".");
-                                                    Thread.Sleep(1000);
-                                                    Console.ResetColor();
+                                                    Presionar();
                                                     Console.Clear(); 
                                                 }
                                             } while (!error);
@@ -991,6 +1018,391 @@ class Program
                         }
                         Console.Clear();
                     } while (opcion != "5");
+                    break;
+                case "2":
+                    do
+                    {
+                        Console.ForegroundColor=ConsoleColor.Blue;
+                        Console.WriteLine("===CLIENTES===");
+                        Console.WriteLine();
+                        Console.ResetColor();
+                        Console.WriteLine("1. Ingresar Cliente");
+                        Console.WriteLine("2. Ver a Todos los clientes");
+                        Console.WriteLine("3. Modificar Cliente");
+                        Console.WriteLine("4. Buscar Cliente");
+                        Console.WriteLine("5. Ver historial de compras");
+                        Console.ForegroundColor= ConsoleColor.Red;
+                        Console.WriteLine("6. Volver al MENU");
+                        Console.WriteLine();
+                        Console.ResetColor();
+                        Console.Write("Ingres una opcion: "); opcion= Console.ReadLine();
+                        Console.Clear();
+                        switch (opcion)
+                        {
+                            case "1":
+                                do
+                                {
+                                    Console.Write("ingrese Nombre del cliente: ");
+                                    string nombre=Console.ReadLine();
+                                    nombre = nombre.ToLower();
+                                    Console.WriteLine();
+                                    int numero;
+                                    do
+                                    {
+                                        Console.Write("ingrese el numero de telefono: ");
+                                        error = int.TryParse(Console.ReadLine(), out numero);
+                                    } while (!error);
+                                    Console.WriteLine();
+                                    string subClientes; TipoCliente tipoSeleccionado=TipoCliente.Frecuente;
+                                    do
+                                    {
+                                        Console.ForegroundColor= ConsoleColor.Blue;
+                                        Console.WriteLine("===Seleccione el Tipo de Cliente===");
+                                        Console.WriteLine();
+                                        Console.ResetColor();
+                                        Console.WriteLine("1. Frecuente");
+                                        Console.WriteLine("2. Credito");
+                                        Console.WriteLine();
+                                        Console.Write("ingrese opcion: "); subClientes = Console.ReadLine();
+                                        switch (subClientes)
+                                        {
+                                            case "1":
+                                                tipoSeleccionado = TipoCliente.Frecuente;
+                                                break;
+                                            case "2":
+                                                tipoSeleccionado=TipoCliente.Credito;                                      
+                                                break;
+                                            default:
+                                                Console.Clear();
+                                                break;
+                                        }
+                                    } while (subClientes!="1" && subClientes!="2");
+
+                                    try
+                                    {
+                                        Cliente c1 = new Cliente(IDcliente,nombre,numero,tipoSeleccionado);
+                                        clientes.Add(IDcliente,c1);
+                                        IDcliente += 1;
+                                        Console.WriteLine();
+                                        Console.ForegroundColor= ConsoleColor.Green;
+                                        Console.WriteLine("Cliente ingresado con Exito");
+                                        Console.ResetColor();
+                                        Console.WriteLine();
+                                        Presionar();
+                                        error = true;
+                                        Console.Clear();
+                                    }
+                                    catch(Exception ex)
+                                    {
+                                        Console.ForegroundColor= ConsoleColor.Yellow;
+                                        Console.WriteLine();
+                                        Console.WriteLine(ex.Message);
+                                        Console.ResetColor();
+                                        Console.WriteLine();
+                                        Presionar();
+                                        error = false;
+                                        Console.Clear();
+                                    }
+                                } while (!error);
+                                break;
+                            case "2":
+                                Console.ForegroundColor=ConsoleColor.Blue;
+                                Console.WriteLine("===Todos los clientes===");
+                                Console.WriteLine();
+                                Console.ResetColor();
+
+                                if (clientes.Count == 0)
+                                {
+                                    Console.ForegroundColor = ConsoleColor.Yellow;
+                                    Console.WriteLine("no hay clientes resgistrados");
+                                    Console.ResetColor();
+                                }
+                                else
+                                {
+                                    foreach (KeyValuePair<int, Cliente> c in clientes)
+                                    {
+                                        c.Value.MostrarInfo();
+                                        Console.WriteLine();
+                                        Console.WriteLine("======================================");
+                                    }
+                                }
+                                Presionar();
+                                Console.Clear();
+                                break;
+                            case "3":
+                                int IDc;
+                                do
+                                {
+                                    Console.Write("Ingrese ID del Cliente: ");
+                                    error=int.TryParse(Console.ReadLine(), out IDc);
+                                } while (!error);
+
+                                if (clientes.ContainsKey(IDc))
+                                {
+                                    Console.Clear();
+                                    do
+                                    {
+                                        clientes[IDc].MostrarInfo();
+                                        Console.WriteLine();
+                                        Console.ForegroundColor = ConsoleColor.Blue;
+                                        Console.WriteLine("===opciones para cliente===");
+                                        Console.WriteLine();
+                                        Console.ResetColor();
+                                        Console.WriteLine("1. Modificar Nombre");
+                                        Console.WriteLine("2. Modificar numero de telefono");
+                                        Console.WriteLine("3. Modificar Tipo de Cliente");
+                                        Console.ForegroundColor= ConsoleColor.Red;
+                                        Console.WriteLine("4. Volver a Clientes");
+                                        Console.ResetColor();
+                                        Console.WriteLine();
+                                        Console.Write("Ingrese una opcion: "); opcion = Console.ReadLine();
+                                        Console.Clear();
+                                        switch (opcion)
+                                        {
+                                            case "1":
+                                                do
+                                                {
+                                                    try
+                                                    {
+                                                        Console.Write("Ingrese el nuevo Nombre: ");
+                                                        clientes[IDc].ModificarNombre(Console.ReadLine());
+                                                        Console.ForegroundColor=ConsoleColor.Green;
+                                                        Console.WriteLine();
+                                                        Console.WriteLine("Nombre modificado con exito");
+                                                        Console.ResetColor();
+                                                        Console.WriteLine();
+                                                        Presionar();
+                                                        error = true;
+                                                    }
+                                                    catch(Exception ex)
+                                                    {
+                                                        Console.ForegroundColor = ConsoleColor.Yellow;
+                                                        Console.WriteLine();
+                                                        Console.WriteLine(ex.Message);
+                                                        Console.ResetColor();
+                                                        Console.WriteLine();
+                                                        Presionar();
+                                                        error = false;
+                                                        Console.Clear();
+                                                    }
+                                                } while (!error);
+                                                break;
+                                            case "2":
+                                                do
+                                                {
+                                                    int nuevonumero;
+                                                    do
+                                                    {
+                                                        Console.Write("Ingrese el nuevo numero: ");
+                                                        error=int.TryParse(Console.ReadLine(), out nuevonumero);
+                                                    } while (!error);
+                                                    try
+                                                    {
+
+                                                        clientes[IDc].ModificarNumero(nuevonumero);
+                                                        Console.ForegroundColor = ConsoleColor.Green;
+                                                        Console.WriteLine();
+                                                        Console.WriteLine("numero modificado con exito");
+                                                        Console.ResetColor();
+                                                        Console.WriteLine();
+                                                        Presionar();
+                                                        error = true;
+                                                    }
+                                                    catch (Exception ex)
+                                                    {
+                                                        Console.ForegroundColor = ConsoleColor.Yellow;
+                                                        Console.WriteLine();
+                                                        Console.WriteLine(ex.Message);
+                                                        Console.ResetColor();
+                                                        Console.WriteLine();
+                                                        Presionar();
+                                                        error = false;
+                                                        Console.Clear();
+                                                    }
+                                                } while (!error);
+                                                break;
+                                            case "3":
+                                                do
+                                                {
+                                                    TipoCliente nuevotipo= TipoCliente.Frecuente;
+                                                    do
+                                                    {
+                                                        Console.ForegroundColor= ConsoleColor.Blue;
+                                                        Console.WriteLine("Seleccione Tipo de Cliente");
+                                                        Console.ResetColor();
+                                                        Console.WriteLine();
+                                                        Console.WriteLine("1. Frecuentes");
+                                                        Console.WriteLine("2 Credito");
+                                                        Console.WriteLine();
+                                                        Console.Write("ingrese una opcion: ");
+                                                        opcion = Console.ReadLine();
+                                                        Console.Clear();
+                                                        switch (opcion)
+                                                        {
+                                                            case "1":
+                                                                nuevotipo = TipoCliente.Frecuente;
+                                                                break;
+                                                            case "2":
+                                                                nuevotipo = TipoCliente.Credito;
+                                                                break;
+                                                        }
+                                                    } while (opcion!="1" && opcion!="2");
+                                                    try
+                                                    {
+
+                                                        clientes[IDc].ModificarTipo(nuevotipo);
+                                                        Console.ForegroundColor = ConsoleColor.Green;
+                                                        Console.WriteLine();
+                                                        Console.WriteLine("Tipo de cliente modificado con exito");
+                                                        Console.ResetColor();
+                                                        Console.WriteLine();
+                                                        Presionar();
+                                                        error = true;
+                                                    }
+                                                    catch (Exception ex)
+                                                    {
+                                                        Console.ForegroundColor = ConsoleColor.Yellow;
+                                                        Console.WriteLine();
+                                                        Console.WriteLine(ex.Message);
+                                                        Console.ResetColor();
+                                                        Console.WriteLine();
+                                                        Presionar();
+                                                        error = false;
+                                                        Console.Clear();
+                                                    }
+                                                } while (!error);
+                                                break;
+                                            case "4":
+                                                break;
+                                            default:
+                                                Console.WriteLine();
+                                                Console.ForegroundColor = ConsoleColor.Red;
+                                                Console.WriteLine("opcion no valida");
+                                                Console.ResetColor();
+                                                Presionar();
+                                                
+                                                break;
+                                        }
+                                        Console.Clear();
+                                        
+                                    } while (opcion != "4");
+                                }
+                                else
+                                {
+                                    Console.WriteLine();
+                                    Console.ForegroundColor = ConsoleColor.Yellow;
+                                    Console.WriteLine("Cliente no Encontrado");
+                                    Console.WriteLine();
+                                    Console.ResetColor();
+                                    Presionar();
+                                    Console.Clear();
+                                }
+                                break;
+                            case "4":
+                                do
+                                {
+                                    Console.ForegroundColor = ConsoleColor.Blue;
+                                    Console.WriteLine("===Buscar Cliente===");
+                                    Console.ResetColor();
+                                    Console.WriteLine();
+                                    Console.WriteLine("1. Buscar por ID de Cliente: ");
+                                    Console.WriteLine("2. Buscar por Nombre de Cliente: ");
+                                    Console.ForegroundColor = ConsoleColor.Red;
+                                    Console.WriteLine("3. Salir");
+                                    Console.ResetColor();
+                                    Console.WriteLine();
+                                    Console.Write("Ingrese una opcion: "); opcion = Console.ReadLine();
+                                    Console.Clear();
+                                    switch (opcion)
+                                    {
+                                        case "1":
+                                            do
+                                            {
+                                                Console.Write("ingrese ID de Cliente: ");
+                                                error = int.TryParse(Console.ReadLine(), out IDc);
+                                            } while (!error);
+                                            do
+                                            {
+
+                                                if (clientes.ContainsKey(IDc))
+                                                {
+                                                    Console.ForegroundColor = ConsoleColor.Blue;
+                                                    Console.WriteLine("===Cliente encontrado===");
+                                                    Console.WriteLine();
+                                                    Console.ResetColor();
+                                                    clientes[IDc].MostrarInfo();
+                                                    Presionar();
+                                                    Console.Clear();
+                                                }
+                                                else
+                                                {
+                                                    Console.WriteLine();
+                                                    Console.ForegroundColor = ConsoleColor.Yellow;
+                                                    Console.WriteLine("Cliente no encontrado");
+                                                    Console.WriteLine();
+                                                    Presionar();
+                                                    Console.Clear();
+                                                }
+                                            } while (!error);
+                                            break;
+                                        case "2":
+                                            Console.Write("ingrese nombre del Cliente: ");
+                                            string nombre = Console.ReadLine();
+                                            nombre = nombre.ToLower();
+                                            Console.WriteLine();
+                                            int cont = 0;
+                                            foreach (KeyValuePair<int, Cliente> c in clientes)
+                                            {
+                                                if (c.Value.Nombre == nombre)
+                                                {
+                                                    Console.WriteLine();
+                                                    Console.ForegroundColor = ConsoleColor.Blue;
+                                                    Console.WriteLine("===Cliente Encontrado===");
+                                                    Console.ResetColor();
+                                                    Console.WriteLine();
+                                                    c.Value.MostrarInfo();
+                                                    cont = 1;
+                                                }
+                                                break;
+                                            }
+                                            if (cont == 0)
+                                            {
+                                                Console.WriteLine();
+                                                Console.ForegroundColor = ConsoleColor.Yellow;
+                                                Console.WriteLine("===Cliente no encontrado===");
+                                                Console.ResetColor();
+                                                Console.WriteLine();
+                                            }
+                                            Presionar();
+                                            Console.Clear();
+                                            break;
+                                        case "3":
+                                            break;
+                                        default:
+                                            Console.WriteLine();
+                                            Console.ForegroundColor = ConsoleColor.Red;
+                                            Console.WriteLine("opcion no valida");
+                                            Console.ResetColor();
+                                            Presionar();
+                                            Console.Clear();
+                                            break;
+                                    }
+                                } while (opcion != "3");
+                                break;
+                            case "5":
+                                break;
+                            case "6":
+                                break;
+                            default:
+                                Console.WriteLine();
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine("opcion no valida");
+                                Console.ResetColor();
+                                Presionar();
+                                Console.Clear();
+                                break;
+                        }
+                    } while (opcion != "6");
                     break;
             }
         } while (opcion!="8");
