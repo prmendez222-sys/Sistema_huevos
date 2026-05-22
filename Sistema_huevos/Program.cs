@@ -334,7 +334,14 @@ class DetalleVenta
     public int Cantidad
     {
         get { return cantidad; }
-        set { cantidad = value; }
+        set 
+        {
+            if (value <= 0) throw new Exception("la cantidad debe ser mayor a cero");
+            else
+            {
+                cantidad = value;
+            }
+        }
     }
 
 
@@ -622,8 +629,10 @@ class Program
 
         Dictionary<int,Producto> productos= new Dictionary<int,Producto>();
         Dictionary<int,Cliente> clientes= new Dictionary<int,Cliente>();
+        Dictionary<int, Venta> ventas = new Dictionary<int, Venta>();
+        List<DetalleVenta> detalles = new List<DetalleVenta>();
 
-        string opcion; bool error; int IDproducto = 1, IDcliente=1; 
+        string opcion; bool error; int IDproducto = 1, IDcliente=1; int IDventa = 1; int IDdetalleventa=1;
         do
         {
             Console.WriteLine("====MENU====");
@@ -1403,6 +1412,151 @@ class Program
                                 break;
                         }
                     } while (opcion != "6");
+                    break;
+                case "3":
+                    do
+                    {
+                        Console.ForegroundColor= ConsoleColor.Blue;
+                        Console.WriteLine("===VENTAS===");
+                        Console.ResetColor();
+                        Console.WriteLine();
+                        Console.WriteLine("1. Registrar Venta");
+                        Console.WriteLine("2. Ver todas Las Ventas");
+                        Console.WriteLine("3. Buscar Venta");
+                        Console.ForegroundColor=ConsoleColor.Red;
+                        Console.WriteLine("4. Volver al Menu");
+                        Console.ResetColor();
+                        Console.WriteLine();
+                        Console.Write("ingrese una opcion: "); opcion = Console.ReadLine();
+                        Console.Clear();
+                        switch (opcion)
+                        {
+                            case "1":
+                                do
+                                {
+                                    int IDventacliente=0;
+                                    do
+                                    {
+                                        Console.ForegroundColor = ConsoleColor.Yellow;
+                                        Console.WriteLine("La venta se Realiza a un Cliente?");
+                                        
+                                        Console.ResetColor();
+                                        Console.WriteLine();
+                                        Console.WriteLine("1. si");
+                                        Console.WriteLine("2. no");
+                                        Console.WriteLine();
+                                        Console.Write("ingres una opcion: "); opcion = Console.ReadLine();
+                                        Console.Clear();
+                                        switch (opcion)
+                                        {
+                                            case "1":
+                                                Console.Write("Ingrese ID del cliente: ");
+                                                error = int.TryParse(Console.ReadLine(), out IDventacliente);
+
+                                                if (error)
+                                                {
+                                                    if (clientes.ContainsKey(IDventacliente))
+                                                    {
+                                                        IDventacliente = clientes[IDventacliente].ID;
+                                                        Console.ForegroundColor = ConsoleColor.Blue;
+                                                        Console.WriteLine("cliente: "+clientes[IDventacliente].Nombre);
+                                                        Console.WriteLine();
+                                                        Console.ResetColor();
+                                                        error = true;
+                                                    }
+                                                    else
+                                                    {
+                                                        Console.ForegroundColor = ConsoleColor.Yellow;
+                                                        Console.WriteLine("Cliente no encontrado");
+                                                        Console.WriteLine();
+                                                        Console.ResetColor();
+                                                        Thread.Sleep(2000);
+                                                        Console.Clear();
+                                                        error = false;
+                                                    }
+                                                }
+                                                break;
+                                            case "2":
+                                                error = true;
+                                                break;
+                                            default:
+                                                Console.WriteLine();
+                                                Console.ForegroundColor = ConsoleColor.Red;
+                                                Console.WriteLine("opcion no valida");
+                                                Console.ResetColor();
+                                                Presionar();
+                                                Console.Clear();
+                                                error = false;
+                                                break;
+                                        }
+                                    } while ((opcion!="1" && opcion!="2")||!error);
+                                    int IDproductoventa;
+                                    double Preciounitario=0,subtotal=0;
+                                    do
+                                    {
+                                        Console.Write("Ingrese ID del Producto: ");
+                                        error = int.TryParse(Console.ReadLine(), out IDproductoventa);
+                                        if (error)
+                                        {
+                                            if (productos.ContainsKey(IDproductoventa))
+                                            {
+                                                Preciounitario = productos[IDproductoventa].PrecioUnitario;
+                                                Console.ForegroundColor= ConsoleColor.Blue;
+                                                Console.WriteLine("===producto===");
+                                                Console.WriteLine();
+                                                Console.ResetColor();
+                                                Console.WriteLine("Nombre del producto: "+productos[IDproductoventa].Nombre);
+                                                Console.WriteLine("Precio unitario: "+productos[IDproductoventa].PrecioUnitario);
+                                                error = true;
+                                            }
+                                            else
+                                            {
+                                                Console.ForegroundColor = ConsoleColor.Yellow;
+                                                Console.WriteLine("Producto no encontrado");
+                                                Console.WriteLine();
+                                                Console.ResetColor();
+                                                Thread.Sleep(1000);
+                                                error = false;
+                                            }
+                                        }
+                                    } while (!error);
+                                    int cantidad = 0;
+                                    do
+                                    {
+                                        do
+                                        {
+                                            Console.WriteLine();
+                                            Console.Write("Ingrese la cantidad comprada: ");
+                                            error = int.TryParse(Console.ReadLine(), out cantidad);
+                                        } while (!error);
+
+                                        subtotal = cantidad * Preciounitario;
+                                        try
+                                        {
+                                            DetalleVenta d1 = new DetalleVenta(IDdetalleventa, IDventa, IDproductoventa, cantidad, Preciounitario, subtotal);
+                                            detalles.Add(d1);
+                                            error = true;
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            Console.ForegroundColor = ConsoleColor.Yellow;
+                                            Console.WriteLine();
+                                            Console.WriteLine(ex.Message);
+                                            Console.ResetColor();
+                                            Console.WriteLine();
+                                            Presionar();
+                                            error = false;
+                                        }
+                                    } while (!error);
+                                    Console.WriteLine();
+                                    Console.WriteLine("Subtotal: "+subtotal);
+                                    error = true;
+                                    Presionar();
+                                } while (!error);
+                                break;
+                        }
+                        Console.Clear();
+                    } while (opcion != "4");
                     break;
             }
         } while (opcion!="8");
