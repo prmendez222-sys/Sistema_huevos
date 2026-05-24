@@ -1523,6 +1523,7 @@ class Program
                                                     if (productos[IDproductoventa].Stockactual <= 0)
                                                     {
                                                         Console.WriteLine("error");
+                                                        haystock = false;
                                                         Presionar();
                                                     }
                                                     else
@@ -1551,44 +1552,67 @@ class Program
                                                 }
                                             }
                                         } while (!error);
-                                        int cantidad = 0;
-                                        do
+                                        if (haystock)
                                         {
+                                            int cantidad = 0;
                                             do
                                             {
-                                                Console.WriteLine();
-                                                Console.Write("Ingrese la cantidad comprada: ");
-                                                error = int.TryParse(Console.ReadLine(), out cantidad);
+                                                do
+                                                {
+                                                    Console.WriteLine();
+                                                    Console.Write("Ingrese la cantidad comprada: ");
+                                                    error = int.TryParse(Console.ReadLine(), out cantidad);
+                                                } while (!error);
+
+                                                try
+                                                {
+                                                    if (cantidad > productos[IDproductoventa].Stockactual)
+                                                    {
+                                                        Console.ForegroundColor= ConsoleColor.Yellow;
+                                                        Console.WriteLine();
+                                                        Console.WriteLine("error: la cantidad supera al stock con el que se cuenta");
+                                                        cantidad = 0;
+                                                        Console.ResetColor();
+                                                        error = true;
+                                                    }
+                                                    else
+                                                    {
+                                                        subtotal += cantidad * Preciounitario;
+                                                        DetalleVenta d1 = new DetalleVenta(IDdetalleventa, IDventa, IDproductoventa, cantidad, Preciounitario, subtotal);
+                                                        productos[IDproductoventa].Stockactual = productos[IDproductoventa].Stockactual - cantidad;
+                                                        detalles.Add(d1);
+                                                        error = true;
+                                                    }
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    Console.ForegroundColor = ConsoleColor.Yellow;
+                                                    Console.WriteLine(ex.Message);
+                                                    Console.ResetColor();
+                                                    Console.WriteLine();
+                                                    Thread.Sleep(100);
+                                                    error = false;
+                                                }
                                             } while (!error);
 
-                                            try
-                                            {
-                                                subtotal += cantidad * Preciounitario;
-                                                DetalleVenta d1 = new DetalleVenta(IDdetalleventa, IDventa, IDproductoventa, cantidad, Preciounitario, subtotal);
-                                                detalles.Add(d1);
-                                                error = true;
-                                            }
-                                            catch (Exception ex)
+
+                                            do
                                             {
                                                 Console.ForegroundColor = ConsoleColor.Yellow;
-                                                Console.WriteLine(ex.Message);
-                                                Console.ResetColor();
                                                 Console.WriteLine();
-                                                Thread.Sleep(100);
-                                                error = false;
-                                            }
-                                        } while (!error);
-                                        do
+                                                Console.WriteLine("desea ingresar otro producto?");
+                                                Console.WriteLine();
+                                                Console.ResetColor();
+                                                Console.WriteLine("1. si");
+                                                Console.WriteLine("2. no");
+                                                Console.Write("ingres una opcion: "); opcion = Console.ReadLine();
+                                            } while (opcion != "1" && opcion != "2");
+                                        }
+                                        else
                                         {
-                                            Console.ForegroundColor = ConsoleColor.Yellow;
-                                            Console.WriteLine();
-                                            Console.WriteLine("desea ingresar otro producto?");
-                                            Console.WriteLine();
-                                            Console.ResetColor();
-                                            Console.WriteLine("1. si");
-                                            Console.WriteLine("2. no");
-                                            Console.Write("ingres una opcion: "); opcion = Console.ReadLine();
-                                        } while (opcion!="1" && opcion!="2");
+                                            error = true;
+                                            opcion = "3";
+                                        }
 
                                         if (opcion == "1")
                                         {
@@ -1624,53 +1648,62 @@ class Program
                                             IDdetalleventa += 1;
                                         }
                                     } while (!error);
-                                    Console.ForegroundColor = ConsoleColor.Blue;
-                                    Console.WriteLine("Subtotal: " + subtotal);
-                                    Console.WriteLine();
-                                    Console.ResetColor();
-                                    SiNo escredito = SiNo.no;
-                                    do
-                                    {
-                                        Console.WriteLine();
-                                        Console.ForegroundColor = ConsoleColor.Blue;
-                                        Console.WriteLine("Es credito? ");
-                                        Console.ResetColor();
-                                        Console.WriteLine();
-                                        Console.WriteLine("1. Si");
-                                        Console.WriteLine("2. no");
-                                        Console.WriteLine();
-                                        Console.Write("Ingrese una opcion: "); opcion = Console.ReadLine();
-                                        switch (opcion)
-                                        {
-                                            case "1":
-                                                escredito = SiNo.si;
-                                                break;
-                                            case "2":
-                                                escredito = SiNo.no;
-                                                break;
-                                        }
-                                    } while (opcion != "1" && opcion != "2");
-                                    if (IDventacliente == 0 && opcion == "1")
-                                    {
-                                        Console.ForegroundColor = ConsoleColor.Red;
-                                        Console.WriteLine("Error: Primero debe registrar a un cliente");
-                                        Console.ResetColor();
-                                        Presionar();
-                                        Console.Clear();
-                                        error = true;
-                                    }
-                                    else if (IDcliente != 0 && (opcion == "1"))
-                                    {
-                                        if (opcion == "1")
-                                        {
 
-                                        }
-                                        Presionar();
-                                    }
-                                    else
+                                    if (haystock)
                                     {
-                                        Presionar();
+                                        Console.ForegroundColor = ConsoleColor.Blue;
+                                        Console.WriteLine("Subtotal: " + subtotal);
+                                        Console.WriteLine();
+                                        Console.ResetColor();
                                     }
+
+                                    if (haystock)
+                                    {
+                                        SiNo escredito = SiNo.no;
+                                        do
+                                        {
+                                            Console.WriteLine();
+                                            Console.ForegroundColor = ConsoleColor.Blue;
+                                            Console.WriteLine("Es credito? ");
+                                            Console.ResetColor();
+                                            Console.WriteLine();
+                                            Console.WriteLine("1. Si");
+                                            Console.WriteLine("2. no");
+                                            Console.WriteLine();
+                                            Console.Write("Ingrese una opcion: "); opcion = Console.ReadLine();
+                                            switch (opcion)
+                                            {
+                                                case "1":
+                                                    escredito = SiNo.si;
+                                                    break;
+                                                case "2":
+                                                    escredito = SiNo.no;
+                                                    break;
+                                            }
+                                        } while (opcion != "1" && opcion != "2");
+                                        if (IDventacliente == 0 && opcion == "1")
+                                        {
+                                            Console.ForegroundColor = ConsoleColor.Red;
+                                            Console.WriteLine("Error: Primero debe registrar a un cliente");
+                                            Console.ResetColor();
+                                            Presionar();
+                                            Console.Clear();
+                                            error = true;
+                                        }
+                                        else if (IDcliente != 0 && (opcion == "1"))
+                                        {
+                                            if (opcion == "1")
+                                            {
+
+                                            }
+                                            Presionar();
+                                        }
+                                        else
+                                        {
+                                            Presionar();
+                                        }
+                                    }
+
                                 } while (!error);
                                 break;
                         }
