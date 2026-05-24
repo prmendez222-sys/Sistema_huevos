@@ -20,8 +20,8 @@ public enum EstadoCredito
 }
 public enum FechaLimite
 {
-    quinceDias=15,
-    treintaDias=30
+    quinceDias = 15,
+    treintaDias = 30
 }
 public enum TipoCliente
 {
@@ -138,22 +138,22 @@ class Producto
 
     public void ModificarPrecio(double nuevoPrecio)
     {
-        PrecioUnitario= nuevoPrecio;
+        PrecioUnitario = nuevoPrecio;
     }
     public void MostrarInfo()
     {
-        Console.WriteLine("ID producto: "+ID);
+        Console.WriteLine("ID producto: " + ID);
         Console.WriteLine("Nombre del Producto: " + Nombre);
-        Console.WriteLine("Costo Unitario: "+CostoUnitario);
-        Console.WriteLine("Precio a consumidor: "+PrecioUnitario);
-        Console.WriteLine("Stock actual: "+Stockactual);
+        Console.WriteLine("Costo Unitario: " + CostoUnitario);
+        Console.WriteLine("Precio a consumidor: " + PrecioUnitario);
+        Console.WriteLine("Stock actual: " + Stockactual);
     }
 }
 
 class Cliente
 {
     private int id;
-    private string nombre="vacio";
+    private string nombre = "vacio";
     private int telefono;
     private TipoCliente tipo;
     private DateTime fecharegistro;
@@ -176,7 +176,7 @@ class Cliente
     public string Nombre
     {
         get { return nombre; }
-        set 
+        set
         {
             if (string.IsNullOrEmpty(value)) throw new Exception("el nombre no puede quedar vacio");
             else nombre = value;
@@ -186,7 +186,7 @@ class Cliente
     public int Telefono
     {
         get { return telefono; }
-        set 
+        set
         {
             if (value.ToString().Count() == 8) telefono = value;
             else throw new Exception("numero de telefono no valido");
@@ -202,16 +202,16 @@ class Cliente
     public DateTime FechaRegistro
     {
         get { return fecharegistro; }
-        set {  fecharegistro = value; }
+        set { fecharegistro = value; }
     }
 
     public void MostrarInfo()
     {
-        Console.WriteLine("ID cliente: "+ID);
-        Console.WriteLine("Nombre del cliente: "+Nombre);
-        Console.WriteLine("Numero de Telefono: "+Telefono);
-        Console.WriteLine("Tipo de Cliente: "+Tipo);
-        Console.WriteLine("Fecha de Registro: "+FechaRegistro);
+        Console.WriteLine("ID cliente: " + ID);
+        Console.WriteLine("Nombre del cliente: " + Nombre);
+        Console.WriteLine("Numero de Telefono: " + Telefono);
+        Console.WriteLine("Tipo de Cliente: " + Tipo);
+        Console.WriteLine("Fecha de Registro: " + FechaRegistro);
     }
 
     public void ModificarNombre(string nuevonombre)
@@ -221,7 +221,7 @@ class Cliente
 
     public void ModificarNumero(int numero)
     {
-        Telefono= numero;
+        Telefono = numero;
     }
     public void ModificarTipo(TipoCliente nuevotipo)
     {
@@ -243,7 +243,7 @@ class Venta
     public int ID
     {
         get { return id; }
-        set { id= value; }
+        set { id = value; }
     }
     public DateTime Fecha
     {
@@ -254,52 +254,52 @@ class Venta
     public int? ClienteID
     {
         get { return clienteId; }
-        set {  clienteId= value; }
+        set { clienteId = value; }
     }
 
     public List<DetalleVenta> Detalles
     {
         get { return detalles; }
-        set {  detalles = value; }
+        set { detalles = value; }
     }
 
     public double Total
     {
         get { return total; }
-        set {  total = value; }
+        set { total = value; }
     }
     public SiNo Escredito
     {
         get { return escredito; }
-        set {  escredito = value; }
+        set { escredito = value; }
     }
     public double Montopagado
     {
         get { return montopagado; }
-        set {  montopagado = value; }
+        set { montopagado = value; }
     }
     public double Saldo
     {
         get { return saldo; }
-        set {  saldo = value; }
+        set { saldo = value; }
     }
     public EstadoVenta EstadoVenta
     {
         get { return estadoventa; }
-        set {  estadoventa = value; }
+        set { estadoventa = value; }
     }
 
-    public Venta(int id, int? idcliente,List<DetalleVenta> detalles, double total, SiNo escredito, double montopagado,double saldo, EstadoVenta estadoventa)
+    public Venta(int id, int? idcliente, List<DetalleVenta> detalles, double total, SiNo escredito, double montopagado, double saldo, EstadoVenta estadoventa)
     {
-        ID= id;
+        ID = id;
         Fecha = DateTime.Now;
-        ClienteID= idcliente;
-        Detalles= detalles;
+        ClienteID = idcliente;
+        Detalles = detalles;
         Total = total;
-        Escredito= escredito;
-        Montopagado= montopagado;
-        Saldo= saldo;
-        EstadoVenta= estadoventa;
+        Escredito = escredito;
+        Montopagado = montopagado;
+        Saldo = saldo;
+        EstadoVenta = estadoventa;
     }
 }
 class DetalleVenta
@@ -313,12 +313,12 @@ class DetalleVenta
 
     public DetalleVenta(int id, int ventaid, int productoid, int cantidad, double preciounitario, double subtotal)
     {
-        ID= id;
-        VentaID= ventaid;
-        ProductoID= productoid;
-        Cantidad= cantidad;
-        PrecioUnitario= preciounitario;
-        SubTotal= subtotal;
+        ID = id;
+        VentaID = ventaid;
+        ProductoID = productoid;
+        Cantidad = cantidad;
+        PrecioUnitario = preciounitario;
+        SubTotal = subtotal;
     }
 
     public double SubTotal
@@ -329,7 +329,7 @@ class DetalleVenta
 
 
     public double PrecioUnitario
-    { 
+    {
         get { return preciounitario; }
         set { preciounitario = value; }
     }
@@ -338,7 +338,7 @@ class DetalleVenta
     public int Cantidad
     {
         get { return cantidad; }
-        set 
+        set
         {
             if (value <= 0) throw new Exception("la cantidad debe ser mayor a cero");
             else
@@ -395,19 +395,19 @@ class Credito
     public int ID
     {
         get { return id; }
-        set { id= value; }
+        set { id = value; }
     }
 
     public int ClienteID
     {
         get { return clienteid; }
-        set { clienteid= value; }
+        set { clienteid = value; }
     }
 
     public int VentaID
     {
         get { return ventaid; }
-        set { ventaid= value; }
+        set { ventaid = value; }
     }
 
     public double MontoOriginal
@@ -424,7 +424,7 @@ class Credito
     public DateTime Fechaotorgado
     {
         get { return fechaotorgado; }
-        set {  fechaotorgado = value; }
+        set { fechaotorgado = value; }
     }
     public DateTime FechaLimite
     {
@@ -434,7 +434,7 @@ class Credito
     public EstadoCredito Estado
     {
         get { return estado; }
-        set {  estado = value; }
+        set { estado = value; }
     }
 }
 
@@ -456,13 +456,13 @@ class Pago
     public int ID
     {
         get { return id; }
-        set {  id = value; }
+        set { id = value; }
     }
 
     public int Clienteid
     {
         get { return clienteid; }
-        set {  clienteid = value; }
+        set { clienteid = value; }
     }
     public double Monto
     {
@@ -485,12 +485,12 @@ class Gasto
     public int ID
     {
         get { return id; }
-        set {  ID = value; }
+        set { ID = value; }
     }
     public string Descripcion
     {
         get { return descripcion; }
-        set {  descripcion = value; }
+        set { descripcion = value; }
     }
     public DateTime Fecha
     {
@@ -523,22 +523,22 @@ class Perdida
     public int ID
     {
         get { return id; }
-        set {  id = value; }
+        set { id = value; }
     }
     public int ProductoID
     {
         get { return productoid; }
-        set {  productoid = value; }
+        set { productoid = value; }
     }
     public int Cantidad
     {
         get { return cantidad; }
-        set {  cantidad = value; }
+        set { cantidad = value; }
     }
     public double Costounitario
     {
         get { return costounitario; }
-        set {  costounitario = value; }
+        set { costounitario = value; }
     }
     public double TotalPerdido
     {
@@ -547,7 +547,7 @@ class Perdida
     }
     public TipoPerdida TipoPerdida
     {
-        get { return tipoperdida;}
+        get { return tipoperdida; }
         set { tipoperdida = value; }
     }
     public DateTime Fecha
@@ -580,7 +580,7 @@ class ReporteFinanciero
 
     public DateTime FechaInicio
     {
-        get { return fechainicio;  }
+        get { return fechainicio; }
         set { fechainicio = value; }
     }
     public DateTime FechaFin
@@ -611,12 +611,12 @@ class ReporteFinanciero
     public double PerdidadTotales
     {
         get { return perdidastotales; }
-        set {  perdidastotales = value; }
+        set { perdidastotales = value; }
     }
     public double Ganacias
     {
         get { return ganacias; }
-        set {  ganacias = value; }
+        set { ganacias = value; }
     }
 }
 
@@ -1411,12 +1411,12 @@ class Program
             Console.WriteLine("5. Gastos");
             Console.WriteLine("6. perdidas");
             Console.WriteLine("7. Reportes");
-            Console.ForegroundColor= ConsoleColor.Red;
+            Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("8. Salir");
             Console.ResetColor();
             Console.WriteLine();
             Console.Write("Ingrese una opcion: ");
-            opcion= Console.ReadLine();
+            opcion = Console.ReadLine();
             Console.Clear();
 
             switch (opcion)
@@ -1432,14 +1432,14 @@ class Program
                     {
                         int IDventacliente = 0, IDproductoventa;
                         double Preciounitario = 0, subtotal = 0;
-                        Console.ForegroundColor= ConsoleColor.Blue;
+                        Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine("===VENTAS===");
                         Console.ResetColor();
                         Console.WriteLine();
                         Console.WriteLine("1. Registrar Venta");
                         Console.WriteLine("2. Ver todas Las Ventas");
                         Console.WriteLine("3. Buscar Venta");
-                        Console.ForegroundColor=ConsoleColor.Red;
+                        Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("4. Volver al Menu");
                         Console.ResetColor();
                         Console.WriteLine();
@@ -1454,7 +1454,7 @@ class Program
                                     {
                                         Console.ForegroundColor = ConsoleColor.Yellow;
                                         Console.WriteLine("La venta se Realiza a un Cliente?");
-                                        
+
                                         Console.ResetColor();
                                         Console.WriteLine();
                                         Console.WriteLine("1. si");
@@ -1474,9 +1474,12 @@ class Program
                                                     {
                                                         IDventacliente = clientes[IDventacliente].ID;
                                                         Console.ForegroundColor = ConsoleColor.Blue;
-                                                        Console.WriteLine("cliente: "+clientes[IDventacliente].Nombre);
                                                         Console.WriteLine();
+                                                        Console.WriteLine("cliente: " + clientes[IDventacliente].Nombre);
                                                         Console.ResetColor();
+                                                        Console.WriteLine();
+                                                        Presionar();
+                                                        Console.Clear();
                                                         error = true;
                                                     }
                                                     else
@@ -1484,6 +1487,7 @@ class Program
                                                         Console.ForegroundColor = ConsoleColor.Yellow;
                                                         Console.WriteLine("Cliente no encontrado");
                                                         Console.WriteLine();
+                                                        IDventacliente = 0;
                                                         Console.ResetColor();
                                                         Thread.Sleep(1000);
                                                         Console.Clear();
@@ -1504,64 +1508,124 @@ class Program
                                                 error = false;
                                                 break;
                                         }
-                                    } while ((opcion!="1" && opcion!="2")||!error);
-                                    do
-                                    {
-                                        Console.Write("Ingrese ID del Producto: ");
-                                        error = int.TryParse(Console.ReadLine(), out IDproductoventa);
-                                        if (error)
-                                        {
-                                            if (productos.ContainsKey(IDproductoventa))
-                                            {
-                                                Preciounitario = productos[IDproductoventa].PrecioUnitario;
-                                                Console.ForegroundColor= ConsoleColor.Blue;
-                                                Console.WriteLine("===producto===");
-                                                Console.WriteLine();
-                                                Console.ResetColor();
-                                                Console.WriteLine("Nombre del producto: "+productos[IDproductoventa].Nombre);
-                                                Console.WriteLine("Precio unitario: "+productos[IDproductoventa].PrecioUnitario);
-                                                error = true;
-                                            }
-                                            else
-                                            {
-                                                Console.ForegroundColor = ConsoleColor.Yellow;
-                                                Console.WriteLine("Producto no encontrado");
-                                                Console.WriteLine();
-                                                Console.ResetColor();
-                                                Thread.Sleep(100);
-                                                error = false;
-                                            }
-                                        }
-                                    } while (!error);
-                                    int cantidad = 0;
+                                    } while ((opcion != "1" && opcion != "2") || !error);
+                                    bool haystock = true; ;
                                     do
                                     {
                                         do
                                         {
-                                            Console.WriteLine();
-                                            Console.Write("Ingrese la cantidad comprada: ");
-                                            error = int.TryParse(Console.ReadLine(), out cantidad);
+                                            Console.Write("Ingrese ID del Producto: ");
+                                            error = int.TryParse(Console.ReadLine(), out IDproductoventa);
+                                            if (error)
+                                            {
+                                                if (productos.ContainsKey(IDproductoventa))
+                                                {
+                                                    if (productos[IDproductoventa].Stockactual <= 0)
+                                                    {
+                                                        Console.WriteLine("error");
+                                                        Presionar();
+                                                    }
+                                                    else
+                                                    {
+                                                        Preciounitario = productos[IDproductoventa].PrecioUnitario;
+                                                        Console.ForegroundColor = ConsoleColor.Blue;
+                                                        Console.WriteLine();
+                                                        Console.WriteLine("===producto===");
+                                                        Console.ResetColor();
+                                                        Console.WriteLine();
+                                                        Console.ResetColor();
+                                                        Console.WriteLine("Nombre del producto: " + productos[IDproductoventa].Nombre);
+                                                        Console.WriteLine("Precio unitario: " + productos[IDproductoventa].PrecioUnitario);
+                                                        Console.WriteLine("Stock Actual: " + productos[IDproductoventa].Stockactual);
+                                                        error = true;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    Console.ForegroundColor = ConsoleColor.Yellow;
+                                                    Console.WriteLine("Producto no encontrado");
+                                                    Console.WriteLine();
+                                                    Console.ResetColor();
+                                                    Thread.Sleep(100);
+                                                    error = false;
+                                                }
+                                            }
                                         } while (!error);
-
-                                        subtotal = cantidad * Preciounitario;
-                                        try
+                                        int cantidad = 0;
+                                        do
                                         {
-                                            DetalleVenta d1 = new DetalleVenta(IDdetalleventa, IDventa, IDproductoventa, cantidad, Preciounitario, subtotal);
-                                            detalles.Add(d1);
-                                            error = true;
-                                        }
-                                        catch (Exception ex)
+                                            do
+                                            {
+                                                Console.WriteLine();
+                                                Console.Write("Ingrese la cantidad comprada: ");
+                                                error = int.TryParse(Console.ReadLine(), out cantidad);
+                                            } while (!error);
+
+                                            try
+                                            {
+                                                subtotal += cantidad * Preciounitario;
+                                                DetalleVenta d1 = new DetalleVenta(IDdetalleventa, IDventa, IDproductoventa, cantidad, Preciounitario, subtotal);
+                                                detalles.Add(d1);
+                                                error = true;
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                Console.ForegroundColor = ConsoleColor.Yellow;
+                                                Console.WriteLine(ex.Message);
+                                                Console.ResetColor();
+                                                Console.WriteLine();
+                                                Thread.Sleep(100);
+                                                error = false;
+                                            }
+                                        } while (!error);
+                                        do
                                         {
                                             Console.ForegroundColor = ConsoleColor.Yellow;
-                                            Console.WriteLine(ex.Message);
-                                            Console.ResetColor();
                                             Console.WriteLine();
-                                            Thread.Sleep(100);
+                                            Console.WriteLine("desea ingresar otro producto?");
+                                            Console.WriteLine();
+                                            Console.ResetColor();
+                                            Console.WriteLine("1. si");
+                                            Console.WriteLine("2. no");
+                                            Console.Write("ingres una opcion: "); opcion = Console.ReadLine();
+                                        } while (opcion!="1" && opcion!="2");
+
+                                        if (opcion == "1")
+                                        {
+                                            Console.Clear();
                                             error = false;
                                         }
+                                        else if (opcion == "2")
+                                        {
+                                            Console.Clear();
+                                            if (IDventacliente != 0)
+                                            {
+                                                Console.ForegroundColor= ConsoleColor.Blue;
+                                                Console.WriteLine("Cliente: "+clientes[IDventacliente].Nombre);
+                                                Console.ResetColor();
+                                                Console.WriteLine();
+                                            }
+                                            Console.WriteLine("===PRODUCTOS VENDIDOS===");
+                                            Console.WriteLine();
+                                            foreach (DetalleVenta d in detalles)
+                                            {
+                                                if (IDventa == IDdetalleventa)
+                                                {
+                                                    string nombre = productos[d.ProductoID].Nombre;
+                                                    double precio = productos[d.ProductoID].PrecioUnitario;
+                                                    Console.WriteLine("Nombre del producto: " + nombre);
+                                                    Console.WriteLine("Precio unitario: " + precio);
+                                                    Console.WriteLine("cantidad: " + d.Cantidad);
+                                                    Console.WriteLine("=====================================");
+                                                    Console.WriteLine();
+                                                }
+                                            }
+
+                                            IDdetalleventa += 1;
+                                        }
                                     } while (!error);
-                                    Console.ForegroundColor= ConsoleColor.Blue;
-                                    Console.WriteLine("Subtotal: "+subtotal);
+                                    Console.ForegroundColor = ConsoleColor.Blue;
+                                    Console.WriteLine("Subtotal: " + subtotal);
                                     Console.WriteLine();
                                     Console.ResetColor();
                                     SiNo escredito = SiNo.no;
@@ -1575,7 +1639,7 @@ class Program
                                         Console.WriteLine("1. Si");
                                         Console.WriteLine("2. no");
                                         Console.WriteLine();
-                                        Console.Write("Ingrese una opcion: ");opcion = Console.ReadLine();
+                                        Console.Write("Ingrese una opcion: "); opcion = Console.ReadLine();
                                         switch (opcion)
                                         {
                                             case "1":
@@ -1585,24 +1649,26 @@ class Program
                                                 escredito = SiNo.no;
                                                 break;
                                         }
-                                    } while (opcion!="1" && opcion!="2");
-                                    if(IDventacliente==0 && opcion=="1")
+                                    } while (opcion != "1" && opcion != "2");
+                                    if (IDventacliente == 0 && opcion == "1")
                                     {
-                                        Console.ForegroundColor= ConsoleColor.Red;
+                                        Console.ForegroundColor = ConsoleColor.Red;
                                         Console.WriteLine("Error: Primero debe registrar a un cliente");
                                         Console.ResetColor();
                                         Presionar();
                                         Console.Clear();
                                         error = true;
-                                    }else if (IDcliente!=0 && (opcion=="2" || opcion=="1"))
+                                    }
+                                    else if (IDcliente != 0 && (opcion == "1"))
                                     {
                                         if (opcion == "1")
                                         {
-                                            Console.WriteLine("se hara la logica para modificar a cliente en caso sea necesario");
-                                        }else if (opcion == "2")
-                                        {
-                                            Console.WriteLine("no hace nada XD");
+
                                         }
+                                        Presionar();
+                                    }
+                                    else
+                                    {
                                         Presionar();
                                     }
                                 } while (!error);
@@ -1612,6 +1678,6 @@ class Program
                     } while (opcion != "4");
                     break;
             }
-        } while (opcion!="8");
+        } while (opcion != "8");
     }
 }
