@@ -276,7 +276,11 @@ class Venta
     public double Montopagado
     {
         get { return montopagado; }
-        set { montopagado = value; }
+        set 
+        {
+            if (value < 0) throw new Exception("el monto no puede ser menor a cero");
+            else montopagado = value;
+        }
     }
     public double Saldo
     {
@@ -300,6 +304,17 @@ class Venta
         Montopagado = montopagado;
         Saldo = saldo;
         EstadoVenta = estadoventa;
+    }
+
+    public void MostrarVentas()
+    {
+        Console.WriteLine("ID: "+ID);
+        Console.WriteLine("ID cliente: "+ClienteID);
+        Console.WriteLine("total: "+Total);
+        Console.WriteLine("Es credito? "+Escredito);
+        Console.WriteLine("Monto pagado: "+Montopagado);
+        Console.WriteLine("Saldo: "+Saldo);
+        Console.WriteLine("estado: "+EstadoVenta);
     }
 }
 class DetalleVenta
@@ -1431,7 +1446,7 @@ class Program
                     do
                     {
                         int IDventacliente = 0, IDproductoventa;
-                        int cantidad = 0;
+                        int cantidad = 0; double MontoPagado = 0; double Saldo = 0; EstadoVenta estado = EstadoVenta.Pagada;
                         double Preciounitario = 0, subtotal = 0;
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine("===VENTAS===");
@@ -1510,7 +1525,6 @@ class Program
                                                 break;
                                         }
                                     } while ((opcion != "1" && opcion != "2") || !error);
-                                    bool haystock = true; ;
                                     do
                                     {
                                         do
@@ -1523,8 +1537,9 @@ class Program
                                                 {
                                                     if (productos[IDproductoventa].Stockactual <= 0)
                                                     {
+                                                        Console.ForegroundColor= ConsoleColor.Yellow;
                                                         Console.WriteLine("error: no hay stock de este producto");
-                                                        haystock = true;
+                                                        Console.ResetColor();
                                                         Presionar();
                                                     }
                                                     else
@@ -1575,21 +1590,21 @@ class Program
                                                     Console.WriteLine("error: la cantidad supera al stock con el que se cuenta");
                                                     cantidad = 0;
                                                     Console.ResetColor();
-                                                    haystock = true;
                                                     error = true;
                                                 }
                                                 else if (productos[IDproductoventa].Stockactual == 0)
                                                 {
                                                     cantidad = 0;
-                                                    haystock = true;
                                                 }
                                                 else
                                                 {
-                                                    subtotal += cantidad * Preciounitario;
+                                                    if (cantidad > 0)
+                                                    {
+                                                        subtotal += cantidad * Preciounitario;
+                                                    }
                                                     DetalleVenta d1 = new DetalleVenta(IDdetalleventa, IDventa, IDproductoventa, cantidad, Preciounitario, subtotal);
                                                     productos[IDproductoventa].Stockactual = productos[IDproductoventa].Stockactual - cantidad;
                                                     detalles.Add(d1);
-                                                    haystock = true;
                                                     error = true;
                                                 }
                                             }
@@ -1658,7 +1673,7 @@ class Program
                                     Console.WriteLine();
                                     Console.ResetColor();
 
-                                    if (haystock && subtotal!=0)
+                                    if (subtotal!=0)
                                     {
                                         SiNo escredito = SiNo.no;
                                         do
@@ -1693,11 +1708,59 @@ class Program
                                         }
                                         else if (IDcliente != 0 && (opcion == "1"))
                                         {
-                                            if (opcion == "1")
+                                            clientes[IDventacliente].ModificarTipo(TipoCliente.Credito);
+                                            do
                                             {
+                                                do
+                                                {
+                                                    Console.WriteLine();
+                                                    Console.ForegroundColor= ConsoleColor.Blue;
+                                                    Console.Write("Ingrese el Monto pagado: ");
+                                                    Console.ResetColor();
+                                                    error = double.TryParse(Console.ReadLine(), out MontoPagado);
+                                                } while (!error);
 
-                                            }
-                                            Presionar();
+                                                try
+                                                {
+                                                    if (MontoPagado >= subtotal)
+                                                    {
+                                                        Console.WriteLine("error el monto supera el total");
+                                                        error = false;
+                                                    }else if(MontoPagado < subtotal && MontoPagado > 0)
+                                                    {
+                                                        Saldo = subtotal - MontoPagado;
+                                                        estado = EstadoVenta.Parcial;
+                                                        error = true;
+                                                    }
+                                                    if (MontoPagado == 0)
+                                                    {
+                                                        Saldo = subtotal;
+                                                        estado = EstadoVenta.Pendiente;
+                                                        error = true;
+                                                    }
+                                                    if (error)
+                                                    {
+                                                        Venta v = new Venta(IDventa, IDventacliente, detalles, subtotal, escredito, MontoPagado, Saldo, estado);
+                                                        ventas.Add(IDventa, v);
+                                                        IDventa += 1;
+                                                        Console.ForegroundColor = ConsoleColor.Green;
+                                                        Console.WriteLine();
+                                                        Console.WriteLine("venta registrada con exito");
+                                                        Console.ResetColor();
+                                                        Presionar();
+                                                        Console.Clear();
+                                                    }
+                                                }
+                                                catch(Exception ex)
+                                                {
+                                                    Console.ForegroundColor = ConsoleColor.Yellow;
+                                                    Console.WriteLine(ex.Message);
+                                                    Console.ResetColor();
+                                                    Console.WriteLine();
+                                                    Thread.Sleep(100);
+                                                    error = false;
+                                                }
+                                            } while (!error);
                                         }
                                         else
                                         {
@@ -1706,6 +1769,16 @@ class Program
                                     }
 
                                 } while (!error);
+                                break;
+                            case "2":
+                                Console.WriteLine("===Todas la ventas===");
+                                Console.WriteLine();
+                                foreach(KeyValuePair<int,Venta> v in ventas)
+                                {
+                                    v.Value.MostrarVentas();
+                                    Console.WriteLine("=========================================");
+                                }
+                                Presionar();
                                 break;
                         }
                         Console.Clear();
