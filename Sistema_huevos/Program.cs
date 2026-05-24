@@ -1431,6 +1431,7 @@ class Program
                     do
                     {
                         int IDventacliente = 0, IDproductoventa;
+                        int cantidad = 0;
                         double Preciounitario = 0, subtotal = 0;
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine("===VENTAS===");
@@ -1522,8 +1523,8 @@ class Program
                                                 {
                                                     if (productos[IDproductoventa].Stockactual <= 0)
                                                     {
-                                                        Console.WriteLine("error");
-                                                        haystock = false;
+                                                        Console.WriteLine("error: no hay stock de este producto");
+                                                        haystock = true;
                                                         Presionar();
                                                     }
                                                     else
@@ -1552,10 +1553,10 @@ class Program
                                                 }
                                             }
                                         } while (!error);
-                                        if (haystock)
+
+                                        do
                                         {
-                                            int cantidad = 0;
-                                            do
+                                            if (productos[IDproductoventa].Stockactual > 0)
                                             {
                                                 do
                                                 {
@@ -1563,56 +1564,58 @@ class Program
                                                     Console.Write("Ingrese la cantidad comprada: ");
                                                     error = int.TryParse(Console.ReadLine(), out cantidad);
                                                 } while (!error);
+                                            }
 
-                                                try
-                                                {
-                                                    if (cantidad > productos[IDproductoventa].Stockactual)
-                                                    {
-                                                        Console.ForegroundColor= ConsoleColor.Yellow;
-                                                        Console.WriteLine();
-                                                        Console.WriteLine("error: la cantidad supera al stock con el que se cuenta");
-                                                        cantidad = 0;
-                                                        Console.ResetColor();
-                                                        error = true;
-                                                    }
-                                                    else
-                                                    {
-                                                        subtotal += cantidad * Preciounitario;
-                                                        DetalleVenta d1 = new DetalleVenta(IDdetalleventa, IDventa, IDproductoventa, cantidad, Preciounitario, subtotal);
-                                                        productos[IDproductoventa].Stockactual = productos[IDproductoventa].Stockactual - cantidad;
-                                                        detalles.Add(d1);
-                                                        error = true;
-                                                    }
-                                                }
-                                                catch (Exception ex)
+                                            try
+                                            {
+                                                if (cantidad > productos[IDproductoventa].Stockactual)
                                                 {
                                                     Console.ForegroundColor = ConsoleColor.Yellow;
-                                                    Console.WriteLine(ex.Message);
-                                                    Console.ResetColor();
                                                     Console.WriteLine();
-                                                    Thread.Sleep(100);
-                                                    error = false;
+                                                    Console.WriteLine("error: la cantidad supera al stock con el que se cuenta");
+                                                    cantidad = 0;
+                                                    Console.ResetColor();
+                                                    haystock = true;
+                                                    error = true;
                                                 }
-                                            } while (!error);
-
-
-                                            do
+                                                else if (productos[IDproductoventa].Stockactual == 0)
+                                                {
+                                                    cantidad = 0;
+                                                    haystock = true;
+                                                }
+                                                else
+                                                {
+                                                    subtotal += cantidad * Preciounitario;
+                                                    DetalleVenta d1 = new DetalleVenta(IDdetalleventa, IDventa, IDproductoventa, cantidad, Preciounitario, subtotal);
+                                                    productos[IDproductoventa].Stockactual = productos[IDproductoventa].Stockactual - cantidad;
+                                                    detalles.Add(d1);
+                                                    haystock = true;
+                                                    error = true;
+                                                }
+                                            }
+                                            catch (Exception ex)
                                             {
                                                 Console.ForegroundColor = ConsoleColor.Yellow;
-                                                Console.WriteLine();
-                                                Console.WriteLine("desea ingresar otro producto?");
-                                                Console.WriteLine();
+                                                Console.WriteLine(ex.Message);
                                                 Console.ResetColor();
-                                                Console.WriteLine("1. si");
-                                                Console.WriteLine("2. no");
-                                                Console.Write("ingres una opcion: "); opcion = Console.ReadLine();
-                                            } while (opcion != "1" && opcion != "2");
-                                        }
-                                        else
+                                                Console.WriteLine();
+                                                Thread.Sleep(100);
+                                                error = false;
+                                            }
+                                        } while (!error);
+
+
+                                        do
                                         {
-                                            error = true;
-                                            opcion = "3";
-                                        }
+                                            Console.ForegroundColor = ConsoleColor.Yellow;
+                                            Console.WriteLine();
+                                            Console.WriteLine("desea ingresar otro producto?");
+                                            Console.WriteLine();
+                                            Console.ResetColor();
+                                            Console.WriteLine("1. si");
+                                            Console.WriteLine("2. no");
+                                            Console.Write("ingres una opcion: "); opcion = Console.ReadLine();
+                                        } while (opcion != "1" && opcion != "2");
 
                                         if (opcion == "1")
                                         {
@@ -1649,15 +1652,13 @@ class Program
                                         }
                                     } while (!error);
 
-                                    if (haystock)
-                                    {
-                                        Console.ForegroundColor = ConsoleColor.Blue;
-                                        Console.WriteLine("Subtotal: " + subtotal);
-                                        Console.WriteLine();
-                                        Console.ResetColor();
-                                    }
 
-                                    if (haystock)
+                                    Console.ForegroundColor = ConsoleColor.Blue;
+                                    Console.WriteLine("Subtotal: " + subtotal);
+                                    Console.WriteLine();
+                                    Console.ResetColor();
+
+                                    if (haystock && subtotal!=0)
                                     {
                                         SiNo escredito = SiNo.no;
                                         do
