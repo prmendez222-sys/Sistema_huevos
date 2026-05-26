@@ -670,12 +670,14 @@ class Program
 
         //variables gobales, listas y diccionarios
         string opcion; bool error; int IDproducto = 1, IDcliente = 1; int IDventa = 1; int IDdetalleventa = 1; int IDcredito=1; int IDpago=1;
+        int IDgasto=1;
         Dictionary<int, Producto> productos = new Dictionary<int, Producto>();
         Dictionary<int, Cliente> clientes = new Dictionary<int, Cliente>();
         Dictionary<int, Venta> ventas = new Dictionary<int, Venta>();
         Dictionary<int, Credito> creditos = new Dictionary<int, Credito>(); 
         List<DetalleVenta> detalles = new List<DetalleVenta>();
         Dictionary<int,Pago> pagos = new Dictionary<int, Pago>();
+        Dictionary<int, Gasto> gastos = new Dictionary<int, Gasto>();
 
         //submenuproductos
         void submenuProductos()
@@ -1874,6 +1876,294 @@ class Program
             } while (opcion != "4");
         }
 
+        //sub menu creditos
+        void SubmenuCreditos()
+        {
+            do
+            {
+                int contCreditos = 0;
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.WriteLine("====Creditos====");
+                Console.ResetColor();
+                Console.WriteLine();
+                Console.WriteLine("1. ver todos los creditos activos");
+                Console.WriteLine("2. ver todos los creditos vencidos");
+                Console.WriteLine("3. Hacer un abono");
+                Console.WriteLine("4. Buscar creditos por cliente");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("5. salir al menu");
+                Console.ResetColor();
+                Console.WriteLine();
+                Console.Write("ingrese una opcion: "); opcion = Console.ReadLine();
+                Console.Clear();
+                switch (opcion)
+                {
+                    case "1":
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine("====Creditos Activos===");
+                        Console.ResetColor();
+                        Console.WriteLine();
+                        foreach (KeyValuePair<int, Credito> c in creditos)
+                        {
+                            if (c.Value.Estado == EstadoCredito.Activo)
+                            {
+                                c.Value.Mostrarcreditos();
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine("===============================");
+                                Console.ResetColor();
+                            }
+                        }
+                        Presionar();
+                        break;
+                    case "2":
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine("====Creditos Vencidos===");
+                        Console.ResetColor();
+                        Console.WriteLine();
+                        foreach (KeyValuePair<int, Credito> c in creditos)
+                        {
+                            if (c.Value.Estado == EstadoCredito.Vencido)
+                            {
+                                c.Value.Mostrarcreditos();
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine("===============================");
+                                Console.ResetColor();
+                            }
+                        }
+                        Presionar();
+                        break;
+                    case "3":
+                        do
+                        {
+                            int IDc;
+                            do
+                            {
+                                Console.Write("ingrese ID de Cliente: ");
+                                error = int.TryParse(Console.ReadLine(), out IDc);
+                            } while (!error);
+
+                            if (clientes.ContainsKey(IDc))
+                            {
+                                if (clientes[IDc].Tipo == TipoCliente.Credito)
+                                {
+                                    Console.ForegroundColor = ConsoleColor.Red;
+                                    Console.WriteLine("Nombre del cliente: " + clientes[IDc].Nombre);
+                                    Console.ResetColor();
+                                    Console.ForegroundColor = ConsoleColor.Blue;
+                                    Console.WriteLine("===Creditos activos===");
+                                    Console.WriteLine();
+                                    Console.ResetColor();
+                                    foreach (KeyValuePair<int, Credito> c in creditos)
+                                    {
+                                        if (c.Value.ClienteID == IDc && c.Value.Estado == EstadoCredito.Activo)
+                                        {
+                                            c.Value.Mostrarcreditos();
+                                            Console.ForegroundColor = ConsoleColor.Green;
+                                            Console.WriteLine("===================================");
+                                            Console.ResetColor();
+                                            contCreditos += 1;
+                                        }
+                                        else
+                                        {
+                                            if (contCreditos == 0)
+                                            {
+                                                contCreditos = 0;
+                                            }
+                                        }
+                                    }
+                                    if (contCreditos > 0)
+                                    {
+                                        int IDcreditoAbono;
+                                        Console.WriteLine();
+                                        do
+                                        {
+                                            do
+                                            {
+                                                Console.Write("ingrese ID del credito a abonar: ");
+                                                error = int.TryParse(Console.ReadLine(), out IDcreditoAbono);
+                                            } while (!error);
+
+                                            if (creditos.ContainsKey(IDcreditoAbono))
+                                            {
+                                                if (creditos[IDcreditoAbono].Estado == EstadoCredito.Activo)
+                                                {
+                                                    do
+                                                    {
+                                                        if (DateTime.Now > creditos[IDcreditoAbono].FechaLimite) creditos[IDcredito].Estado = EstadoCredito.Vencido;
+                                                        Console.Clear();
+                                                        Console.ForegroundColor = ConsoleColor.Red;
+                                                        Console.WriteLine("Nombre del cliente: " + clientes[IDc].Nombre);
+                                                        Console.ResetColor();
+                                                        Console.WriteLine();
+                                                        creditos[IDcreditoAbono].Mostrarcreditos();
+                                                        Console.WriteLine();
+                                                        int monto;
+                                                        do
+                                                        {
+                                                            Console.Write("ingrese monto pagado: ");
+                                                            error = int.TryParse(Console.ReadLine(), out monto);
+                                                        } while (!error);
+                                                        try
+                                                        {
+                                                            if (monto > creditos[IDcreditoAbono].Mtopendiente)
+                                                            {
+                                                                Console.WriteLine("el monto exede el monto pendiente");
+                                                                error = false;
+                                                            }
+                                                            else if (monto == creditos[IDcreditoAbono].Mtopendiente)
+                                                            {
+                                                                int IDabonoventa = creditos[IDcreditoAbono].VentaID;
+                                                                creditos[IDcreditoAbono].Mtopendiente = 0;
+                                                                creditos[IDcreditoAbono].Estado = EstadoCredito.Pagado;
+                                                                ventas[IDabonoventa].Saldo -= monto;
+                                                                ventas[IDabonoventa].Montopagado += monto;
+                                                                ventas[IDabonoventa].EstadoVenta = EstadoVenta.Pagada;
+                                                                error = true;
+                                                            }
+                                                            else if (monto < creditos[IDcreditoAbono].Mtopendiente && monto > 0)
+                                                            {
+                                                                if (DateTime.Now < creditos[IDcreditoAbono].FechaLimite) creditos[IDcreditoAbono].Estado = EstadoCredito.Activo;
+                                                                creditos[IDcreditoAbono].Mtopendiente -= monto;
+                                                                int IDabonoventa = creditos[IDcreditoAbono].VentaID;
+                                                                ventas[IDabonoventa].Saldo -= monto;
+                                                                ventas[IDabonoventa].EstadoVenta = EstadoVenta.Parcial;
+                                                                ventas[IDabonoventa].Montopagado += monto;
+                                                                error = true;
+                                                            }
+                                                            if (error)
+                                                            {
+                                                                Pago p = new Pago(IDpago, IDc, monto);
+                                                                pagos.Add(IDpago, p);
+                                                                IDpago += 1;
+                                                                error = true;
+                                                                Console.ForegroundColor = ConsoleColor.Green;
+                                                                Console.WriteLine("pago registrado con exito");
+                                                                Console.ResetColor();
+                                                                Presionar();
+                                                            }
+
+                                                        }
+                                                        catch (Exception ex)
+                                                        {
+                                                            Console.ForegroundColor = ConsoleColor.Yellow;
+                                                            Console.WriteLine(ex.Message);
+                                                            Console.ResetColor();
+                                                            Console.WriteLine();
+                                                            Presionar();
+                                                            error = false;
+                                                        }
+                                                    } while (!error);
+                                                }
+                                                else
+                                                {
+                                                    Console.ForegroundColor = ConsoleColor.Green;
+                                                    Console.WriteLine("Este credito no esta activo");
+                                                    error = true;
+                                                    Console.ResetColor();
+                                                    Presionar();
+                                                }
+                                            }
+                                            else
+                                            {
+                                                error = false;
+                                            }
+
+                                        } while (!error);
+                                    }
+                                    else
+                                    {
+                                        Console.Clear();
+                                        Console.ForegroundColor = ConsoleColor.Green;
+                                        Console.WriteLine("Nombre del cliente: " + clientes[IDc].Nombre);
+                                        Console.WriteLine("el cliente no tiene creditos activos");
+                                        error = true;
+                                        Console.ResetColor();
+                                        Presionar();
+                                    }
+                                }
+                                else
+                                {
+                                    Console.WriteLine();
+                                    Console.ForegroundColor = ConsoleColor.Yellow;
+                                    Console.WriteLine("Cliente no encontrado");
+                                    error = true;
+                                    Console.WriteLine();
+                                    Presionar();
+                                    Console.Clear();
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine();
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                Console.WriteLine("el cliente no tiene creditos activos");
+                                error = true;
+                                Console.WriteLine();
+                                Presionar();
+                                Console.Clear();
+                            }
+                        } while (!error);
+                        break;
+                    case "4":
+                        int IDclienteb;
+                        do
+                        {
+                            Console.Write("ingrese ID de Cliente: ");
+                            error = int.TryParse(Console.ReadLine(), out IDclienteb);
+                        } while (!error);
+                        if (clientes.ContainsKey(IDclienteb))
+                        {
+                            if (clientes[IDclienteb].Tipo == TipoCliente.Credito)
+                            {
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine("Nombre del cliente: " + clientes[IDclienteb].Nombre);
+                                Console.ResetColor();
+                                Console.ForegroundColor = ConsoleColor.Blue;
+                                Console.WriteLine("===Creditos activos===");
+                                Console.WriteLine();
+                                Console.ResetColor();
+                                foreach (KeyValuePair<int, Credito> c in creditos)
+                                {
+                                    if (c.Value.ClienteID == IDclienteb && c.Value.Estado == EstadoCredito.Activo || c.Value.Estado == EstadoCredito.Vencido)
+                                    {
+                                        c.Value.Mostrarcreditos();
+                                        Console.ForegroundColor = ConsoleColor.Green;
+                                        Console.WriteLine("===================================");
+                                        Console.ResetColor();
+                                    }
+                                }
+
+                                Presionar();
+                            }
+                            else
+                            {
+                                Console.WriteLine();
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                Console.WriteLine("el cliente no tiene creditos activos");
+                                error = true;
+                                Console.WriteLine();
+                                Presionar();
+                                Console.Clear();
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine();
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            Console.WriteLine("Cliente no encontrado");
+                            error = true;
+                            Console.WriteLine();
+                            Presionar();
+                            Console.Clear();
+                        }
+
+                        break;
+                }
+                Console.Clear();
+            } while (opcion != "5");
+        }
+
+        //menu principal
         do
         {
             Console.WriteLine("====MENU====");
@@ -1905,288 +2195,10 @@ class Program
                     SubMenuVenta();
                     break;
                 case "4":
-                    do
-                    {
-                        int contCreditos = 0;
-                        Console.ForegroundColor= ConsoleColor.Blue;  
-                        Console.WriteLine("====Creditos====");
-                        Console.ResetColor();
-                        Console.WriteLine();
-                        Console.WriteLine("1. ver todos los creditos activos");
-                        Console.WriteLine("2. ver todos los creditos vencidos");
-                        Console.WriteLine("3. Hacer un abono");
-                        Console.WriteLine("4. Buscar creditos por cliente");
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("5. salir al menu");
-                        Console.ResetColor();
-                        Console.WriteLine();
-                        Console.Write("ingrese una opcion: "); opcion = Console.ReadLine();
-                        Console.Clear();
-                        switch (opcion)
-                        {
-                            case "1":
-                                Console.ForegroundColor=ConsoleColor.Blue;
-                                Console.WriteLine("====Creditos Activos===");
-                                Console.ResetColor();
-                                Console.WriteLine();
-                                foreach (KeyValuePair<int,Credito> c in creditos)
-                                {
-                                    if (c.Value.Estado == EstadoCredito.Activo)
-                                    {
-                                        c.Value.Mostrarcreditos();
-                                        Console.ForegroundColor = ConsoleColor.Red;
-                                        Console.WriteLine("===============================");
-                                        Console.ResetColor();
-                                    }
-                                }
-                                Presionar();
-                                break;
-                            case "2":
-                                Console.ForegroundColor = ConsoleColor.Blue;
-                                Console.WriteLine("====Creditos Vencidos===");
-                                Console.ResetColor();
-                                Console.WriteLine();
-                                foreach (KeyValuePair<int, Credito> c in creditos)
-                                {
-                                    if (c.Value.Estado == EstadoCredito.Vencido)
-                                    {
-                                        c.Value.Mostrarcreditos();
-                                        Console.ForegroundColor = ConsoleColor.Red;
-                                        Console.WriteLine("===============================");
-                                        Console.ResetColor();
-                                    }
-                                }
-                                Presionar();
-                                break;
-                            case "3":
-                                do
-                                {
-                                    int IDc; 
-                                    do
-                                    {
-                                        Console.Write("ingrese ID de Cliente: ");
-                                        error = int.TryParse(Console.ReadLine(), out IDc);
-                                    } while (!error);
+                    SubmenuCreditos();
+                    break;
+                case "5":
 
-                                    if (clientes.ContainsKey(IDc))
-                                    {
-                                        if (clientes[IDc].Tipo == TipoCliente.Credito)
-                                        {
-                                            Console.ForegroundColor = ConsoleColor.Red;
-                                            Console.WriteLine("Nombre del cliente: " + clientes[IDc].Nombre);
-                                            Console.ResetColor();
-                                            Console.ForegroundColor = ConsoleColor.Blue;
-                                            Console.WriteLine("===Creditos activos===");
-                                            Console.WriteLine();
-                                            Console.ResetColor();
-                                            foreach (KeyValuePair<int, Credito> c in creditos)
-                                            {
-                                                if (c.Value.ClienteID == IDc && c.Value.Estado == EstadoCredito.Activo)
-                                                {
-                                                    c.Value.Mostrarcreditos();
-                                                    Console.ForegroundColor = ConsoleColor.Green;
-                                                    Console.WriteLine("===================================");
-                                                    Console.ResetColor();
-                                                    contCreditos += 1;
-                                                }
-                                                else
-                                                {
-                                                    if (contCreditos == 0)
-                                                    {
-                                                        contCreditos = 0;
-                                                    }
-                                                }
-                                            }
-                                            if (contCreditos > 0)
-                                            {
-                                                int IDcreditoAbono;
-                                                Console.WriteLine();
-                                                do
-                                                {
-                                                    do
-                                                    {
-                                                        Console.Write("ingrese ID del credito a abonar: ");
-                                                        error = int.TryParse(Console.ReadLine(), out IDcreditoAbono);
-                                                    } while (!error);
-
-                                                    if (creditos.ContainsKey(IDcreditoAbono))
-                                                    {
-                                                        if (creditos[IDcreditoAbono].Estado == EstadoCredito.Activo)
-                                                        {
-                                                            do
-                                                            {
-                                                                if (DateTime.Now > creditos[IDcreditoAbono].FechaLimite) creditos[IDcredito].Estado = EstadoCredito.Vencido;
-                                                                Console.Clear();
-                                                                Console.ForegroundColor = ConsoleColor.Red;
-                                                                Console.WriteLine("Nombre del cliente: " + clientes[IDc].Nombre);
-                                                                Console.ResetColor();
-                                                                Console.WriteLine();
-                                                                creditos[IDcreditoAbono].Mostrarcreditos();
-                                                                Console.WriteLine();
-                                                                int monto;
-                                                                do
-                                                                {
-                                                                    Console.Write("ingrese monto pagado: ");
-                                                                    error = int.TryParse(Console.ReadLine(), out monto);
-                                                                } while (!error);
-                                                                try
-                                                                {
-                                                                    if (monto > creditos[IDcreditoAbono].Mtopendiente)
-                                                                    {
-                                                                        Console.WriteLine("el monto exede el monto pendiente");
-                                                                        error = false;
-                                                                    }
-                                                                    else if (monto == creditos[IDcreditoAbono].Mtopendiente)
-                                                                    {
-                                                                        int IDabonoventa = creditos[IDcreditoAbono].VentaID;
-                                                                        creditos[IDcreditoAbono].Mtopendiente = 0;
-                                                                        creditos[IDcreditoAbono].Estado = EstadoCredito.Pagado;
-                                                                        ventas[IDabonoventa].Saldo -= monto;
-                                                                        ventas[IDabonoventa].Montopagado += monto;
-                                                                        ventas[IDabonoventa].EstadoVenta = EstadoVenta.Pagada;
-                                                                        error = true;
-                                                                    }
-                                                                    else if (monto < creditos[IDcreditoAbono].Mtopendiente && monto > 0)
-                                                                    {
-                                                                        if (DateTime.Now < creditos[IDcreditoAbono].FechaLimite) creditos[IDcreditoAbono].Estado = EstadoCredito.Activo;
-                                                                        creditos[IDcreditoAbono].Mtopendiente -= monto;
-                                                                        int IDabonoventa = creditos[IDcreditoAbono].VentaID;
-                                                                        ventas[IDabonoventa].Saldo -= monto;
-                                                                        ventas[IDabonoventa].EstadoVenta = EstadoVenta.Parcial;
-                                                                        ventas[IDabonoventa].Montopagado += monto;
-                                                                        error = true;
-                                                                    }
-                                                                    if (error)
-                                                                    {
-                                                                        Pago p = new Pago(IDpago, IDc, monto);
-                                                                        pagos.Add(IDpago, p);
-                                                                        IDpago += 1;
-                                                                        error = true;
-                                                                        Console.ForegroundColor = ConsoleColor.Green;
-                                                                        Console.WriteLine("pago registrado con exito");
-                                                                        Console.ResetColor();
-                                                                        Presionar();
-                                                                    }
-
-                                                                }
-                                                                catch (Exception ex)
-                                                                {
-                                                                    Console.ForegroundColor = ConsoleColor.Yellow;
-                                                                    Console.WriteLine(ex.Message);
-                                                                    Console.ResetColor();
-                                                                    Console.WriteLine();
-                                                                    Presionar();
-                                                                    error = false;
-                                                                }
-                                                            } while (!error);
-                                                        }
-                                                        else
-                                                        {
-                                                            Console.ForegroundColor = ConsoleColor.Green;
-                                                            Console.WriteLine("Este credito no esta activo");
-                                                            error = true;
-                                                            Console.ResetColor();
-                                                            Presionar();
-                                                        }
-                                                    }
-                                                    else
-                                                    {
-                                                        error = false;
-                                                    }
-
-                                                } while (!error);
-                                            }
-                                            else
-                                            {
-                                                Console.Clear();
-                                                Console.ForegroundColor = ConsoleColor.Green;
-                                                Console.WriteLine("Nombre del cliente: " + clientes[IDc].Nombre);
-                                                Console.WriteLine("el cliente no tiene creditos activos");
-                                                error = true;
-                                                Console.ResetColor();
-                                                Presionar();
-                                            }
-                                        }
-                                        else
-                                        {
-                                            Console.WriteLine();
-                                            Console.ForegroundColor = ConsoleColor.Yellow;
-                                            Console.WriteLine("Cliente no encontrado");
-                                            error = true;
-                                            Console.WriteLine();
-                                            Presionar();
-                                            Console.Clear();
-                                        }
-                                    }
-                                    else
-                                    {
-                                        Console.WriteLine();
-                                        Console.ForegroundColor = ConsoleColor.Green;
-                                        Console.WriteLine("el cliente no tiene creditos activos");
-                                        error = true;
-                                        Console.WriteLine();
-                                        Presionar();
-                                        Console.Clear();
-                                    }
-                                } while (!error);
-                                break;
-                            case "4":
-                                int IDclienteb;
-                                do
-                                {
-                                    Console.Write("ingrese ID de Cliente: ");
-                                    error = int.TryParse(Console.ReadLine(), out IDclienteb);
-                                } while (!error);
-                                if (clientes.ContainsKey(IDclienteb))
-                                {
-                                    if (clientes[IDclienteb].Tipo == TipoCliente.Credito)
-                                    {
-                                        Console.ForegroundColor = ConsoleColor.Red;
-                                        Console.WriteLine("Nombre del cliente: " + clientes[IDclienteb].Nombre);
-                                        Console.ResetColor();
-                                        Console.ForegroundColor = ConsoleColor.Blue;
-                                        Console.WriteLine("===Creditos activos===");
-                                        Console.WriteLine();
-                                        Console.ResetColor();
-                                        foreach (KeyValuePair<int, Credito> c in creditos)
-                                        {
-                                            if (c.Value.ClienteID == IDclienteb && c.Value.Estado == EstadoCredito.Activo || c.Value.Estado == EstadoCredito.Vencido)
-                                            {
-                                                c.Value.Mostrarcreditos();
-                                                Console.ForegroundColor = ConsoleColor.Green;
-                                                Console.WriteLine("===================================");
-                                                Console.ResetColor();
-                                            }
-                                        }
-
-                                        Presionar();
-                                    }
-                                    else
-                                    {
-                                        Console.WriteLine();
-                                        Console.ForegroundColor = ConsoleColor.Green;
-                                        Console.WriteLine("el cliente no tiene creditos activos");
-                                        error = true;
-                                        Console.WriteLine();
-                                        Presionar();
-                                        Console.Clear();
-                                    }
-                                }
-                                else
-                                {
-                                    Console.WriteLine();
-                                    Console.ForegroundColor = ConsoleColor.Yellow;
-                                    Console.WriteLine("Cliente no encontrado");
-                                    error = true;
-                                    Console.WriteLine();
-                                    Presionar();
-                                    Console.Clear();
-                                }
-
-                                break;
-                        }
-                        Console.Clear();
-                    } while (opcion != "5");
                     break;
             }
         } while (opcion != "8");
