@@ -122,13 +122,15 @@ class Producto
         get { return stockactual; }
         set
         {
-            if (stockactual < 0) throw new Exception("el stock no puede ser menor a cero");
-            else stockactual = value;
+            stockactual= value;
         }
     }
     public void ActualizarStock(int nuevoStock)
     {
-        stockactual += nuevoStock;
+        if (nuevoStock > 0)
+        {
+            stockactual += nuevoStock;
+        }
     }
 
     public void ModificarNombre(string nombre)
@@ -516,22 +518,53 @@ class Gasto
 {
     private int id;
     private string descripcion = "";
+    double monto;
     private DateTime fecha;
 
     public int ID
     {
         get { return id; }
-        set { ID = value; }
+        set { id = value; }
     }
     public string Descripcion
     {
         get { return descripcion; }
-        set { descripcion = value; }
+        set 
+        {
+            if (string.IsNullOrEmpty(value)) throw new Exception("la descripcion no puede quedar vacia");
+            else descripcion = value;
+        }
+    }
+
+    public double Monto
+    {
+        get { return monto; }
+        set 
+        {
+            if (value <= 0) throw new Exception("el monto debe ser mayor a cero");
+            else monto = value;
+        }
     }
     public DateTime Fecha
     {
         get { return fecha; }
         set { fecha = value; }
+    }
+
+    public Gasto(int id, string descripcion, double monto)
+    {
+        ID = id;
+        Descripcion = descripcion;
+        Monto= monto;
+        Fecha = DateTime.Now;
+    }
+
+    public void MostrarGastos()
+    {
+        Console.WriteLine("ID de gasto: "+ID);
+        Console.WriteLine("Descripcion: "+Descripcion);
+        Console.WriteLine("Monto: "+Monto);
+        Console.WriteLine("Fecha de Gasto: "+Fecha);
     }
 }
 
@@ -679,6 +712,17 @@ class Program
         Dictionary<int,Pago> pagos = new Dictionary<int, Pago>();
         Dictionary<int, Gasto> gastos = new Dictionary<int, Gasto>();
 
+        void ErrorCatch(Exception ex)
+        {
+            Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine(ex.Message);
+            Console.ResetColor();
+            Console.WriteLine();
+            Presionar();
+            Console.Clear();
+            error = false;
+        }
         //submenuproductos
         void submenuProductos()
         {
@@ -736,10 +780,7 @@ class Program
                             }
                             catch (Exception ex)
                             {
-                                Console.WriteLine(ex.Message);
-                                error = false;
-                                Presionar();
-                                Console.Clear();
+                                ErrorCatch(ex);
                             }
 
                         } while (!error);
@@ -804,10 +845,7 @@ class Program
                                                 }
                                                 catch (Exception ex)
                                                 {
-                                                    Console.WriteLine(ex.Message);
-                                                    Presionar();
-                                                    Console.Clear();
-                                                    error = false;
+                                                    ErrorCatch(ex);
                                                 }
                                             } while (!error);
                                             break;
@@ -833,13 +871,7 @@ class Program
                                                 }
                                                 catch (Exception ex)
                                                 {
-                                                    Console.WriteLine();
-                                                    Console.ForegroundColor = ConsoleColor.Yellow;
-                                                    Console.WriteLine(ex.Message);
-                                                    Console.ResetColor();
-                                                    Presionar();
-                                                    Console.Clear();
-                                                    error = false;
+                                                    ErrorCatch(ex);
                                                 }
                                             } while (!error);
                                             break;
@@ -865,13 +897,7 @@ class Program
                                                 }
                                                 catch (Exception ex)
                                                 {
-                                                    Console.WriteLine();
-                                                    Console.ForegroundColor = ConsoleColor.Yellow;
-                                                    Console.WriteLine(ex.Message);
-                                                    Console.ResetColor();
-                                                    Presionar();
-                                                    Console.Clear();
-                                                    error = false;
+                                                    ErrorCatch(ex);
                                                 }
                                             } while (!error);
                                             break;
@@ -897,13 +923,7 @@ class Program
                                                 }
                                                 catch (Exception ex)
                                                 {
-                                                    Console.WriteLine();
-                                                    Console.ForegroundColor = ConsoleColor.Yellow;
-                                                    Console.WriteLine(ex.Message);
-                                                    Console.ResetColor();
-                                                    Presionar();
-                                                    Console.Clear();
-                                                    error = false;
+                                                    ErrorCatch(ex);
                                                 }
                                             } while (!error);
                                             break;
@@ -1129,14 +1149,7 @@ class Program
                             }
                             catch (Exception ex)
                             {
-                                Console.ForegroundColor = ConsoleColor.Yellow;
-                                Console.WriteLine();
-                                Console.WriteLine(ex.Message);
-                                Console.ResetColor();
-                                Console.WriteLine();
-                                Presionar();
-                                error = false;
-                                Console.Clear();
+                                ErrorCatch(ex);
                             }
                         } while (!error);
                         break;
@@ -1211,14 +1224,7 @@ class Program
                                             }
                                             catch (Exception ex)
                                             {
-                                                Console.ForegroundColor = ConsoleColor.Yellow;
-                                                Console.WriteLine();
-                                                Console.WriteLine(ex.Message);
-                                                Console.ResetColor();
-                                                Console.WriteLine();
-                                                Presionar();
-                                                error = false;
-                                                Console.Clear();
+                                                ErrorCatch(ex);
                                             }
                                         } while (!error);
                                         break;
@@ -1245,14 +1251,7 @@ class Program
                                             }
                                             catch (Exception ex)
                                             {
-                                                Console.ForegroundColor = ConsoleColor.Yellow;
-                                                Console.WriteLine();
-                                                Console.WriteLine(ex.Message);
-                                                Console.ResetColor();
-                                                Console.WriteLine();
-                                                Presionar();
-                                                error = false;
-                                                Console.Clear();
+                                                ErrorCatch(ex);
                                             }
                                         } while (!error);
                                         break;
@@ -1296,14 +1295,7 @@ class Program
                                             }
                                             catch (Exception ex)
                                             {
-                                                Console.ForegroundColor = ConsoleColor.Yellow;
-                                                Console.WriteLine();
-                                                Console.WriteLine(ex.Message);
-                                                Console.ResetColor();
-                                                Console.WriteLine();
-                                                Presionar();
-                                                error = false;
-                                                Console.Clear();
+                                                ErrorCatch(ex);
                                             }
                                         } while (!error);
                                         break;
@@ -1645,12 +1637,7 @@ class Program
                                     }
                                     catch (Exception ex)
                                     {
-                                        Console.ForegroundColor = ConsoleColor.Yellow;
-                                        Console.WriteLine(ex.Message);
-                                        Console.ResetColor();
-                                        Console.WriteLine();
-                                        Thread.Sleep(100);
-                                        error = false;
+                                        ErrorCatch(ex);
                                     }
                                 } while (!error);
 
@@ -1794,12 +1781,7 @@ class Program
                                         }
                                         catch (Exception ex)
                                         {
-                                            Console.ForegroundColor = ConsoleColor.Yellow;
-                                            Console.WriteLine(ex.Message);
-                                            Console.ResetColor();
-                                            Console.WriteLine();
-                                            Thread.Sleep(100);
-                                            error = false;
+                                            ErrorCatch(ex);
                                         }
                                     } while (!error);
                                 }
@@ -1985,82 +1967,84 @@ class Program
 
                                             if (creditos.ContainsKey(IDcreditoAbono))
                                             {
-                                                if (creditos[IDcreditoAbono].Estado == EstadoCredito.Activo)
+                                                if(creditos[IDcreditoAbono].ClienteID == IDc)
                                                 {
-                                                    do
+                                                    if (creditos[IDcreditoAbono].Estado == EstadoCredito.Activo)
                                                     {
-                                                        if (DateTime.Now > creditos[IDcreditoAbono].FechaLimite) creditos[IDcredito].Estado = EstadoCredito.Vencido;
-                                                        Console.Clear();
-                                                        Console.ForegroundColor = ConsoleColor.Red;
-                                                        Console.WriteLine("Nombre del cliente: " + clientes[IDc].Nombre);
-                                                        Console.ResetColor();
-                                                        Console.WriteLine();
-                                                        creditos[IDcreditoAbono].Mostrarcreditos();
-                                                        Console.WriteLine();
-                                                        int monto;
                                                         do
                                                         {
-                                                            Console.Write("ingrese monto pagado: ");
-                                                            error = int.TryParse(Console.ReadLine(), out monto);
-                                                        } while (!error);
-                                                        try
-                                                        {
-                                                            if (monto > creditos[IDcreditoAbono].Mtopendiente)
-                                                            {
-                                                                Console.WriteLine("el monto exede el monto pendiente");
-                                                                error = false;
-                                                            }
-                                                            else if (monto == creditos[IDcreditoAbono].Mtopendiente)
-                                                            {
-                                                                int IDabonoventa = creditos[IDcreditoAbono].VentaID;
-                                                                creditos[IDcreditoAbono].Mtopendiente = 0;
-                                                                creditos[IDcreditoAbono].Estado = EstadoCredito.Pagado;
-                                                                ventas[IDabonoventa].Saldo -= monto;
-                                                                ventas[IDabonoventa].Montopagado += monto;
-                                                                ventas[IDabonoventa].EstadoVenta = EstadoVenta.Pagada;
-                                                                error = true;
-                                                            }
-                                                            else if (monto < creditos[IDcreditoAbono].Mtopendiente && monto > 0)
-                                                            {
-                                                                if (DateTime.Now < creditos[IDcreditoAbono].FechaLimite) creditos[IDcreditoAbono].Estado = EstadoCredito.Activo;
-                                                                creditos[IDcreditoAbono].Mtopendiente -= monto;
-                                                                int IDabonoventa = creditos[IDcreditoAbono].VentaID;
-                                                                ventas[IDabonoventa].Saldo -= monto;
-                                                                ventas[IDabonoventa].EstadoVenta = EstadoVenta.Parcial;
-                                                                ventas[IDabonoventa].Montopagado += monto;
-                                                                error = true;
-                                                            }
-                                                            if (error)
-                                                            {
-                                                                Pago p = new Pago(IDpago, IDc, monto);
-                                                                pagos.Add(IDpago, p);
-                                                                IDpago += 1;
-                                                                error = true;
-                                                                Console.ForegroundColor = ConsoleColor.Green;
-                                                                Console.WriteLine("pago registrado con exito");
-                                                                Console.ResetColor();
-                                                                Presionar();
-                                                            }
-
-                                                        }
-                                                        catch (Exception ex)
-                                                        {
-                                                            Console.ForegroundColor = ConsoleColor.Yellow;
-                                                            Console.WriteLine(ex.Message);
+                                                            if (DateTime.Now > creditos[IDcreditoAbono].FechaLimite) creditos[IDcredito].Estado = EstadoCredito.Vencido;
+                                                            Console.Clear();
+                                                            Console.ForegroundColor = ConsoleColor.Red;
+                                                            Console.WriteLine("Nombre del cliente: " + clientes[IDc].Nombre);
                                                             Console.ResetColor();
                                                             Console.WriteLine();
-                                                            Presionar();
-                                                            error = false;
-                                                        }
-                                                    } while (!error);
+                                                            creditos[IDcreditoAbono].Mostrarcreditos();
+                                                            Console.WriteLine();
+                                                            int monto;
+                                                            do
+                                                            {
+                                                                Console.Write("ingrese monto pagado: ");
+                                                                error = int.TryParse(Console.ReadLine(), out monto);
+                                                            } while (!error);
+                                                            try
+                                                            {
+                                                                if (monto > creditos[IDcreditoAbono].Mtopendiente)
+                                                                {
+                                                                    Console.WriteLine("el monto exede el monto pendiente");
+                                                                    error = false;
+                                                                }
+                                                                else if (monto == creditos[IDcreditoAbono].Mtopendiente)
+                                                                {
+                                                                    int IDabonoventa = creditos[IDcreditoAbono].VentaID;
+                                                                    creditos[IDcreditoAbono].Mtopendiente = 0;
+                                                                    creditos[IDcreditoAbono].Estado = EstadoCredito.Pagado;
+                                                                    ventas[IDabonoventa].Saldo -= monto;
+                                                                    ventas[IDabonoventa].Montopagado += monto;
+                                                                    ventas[IDabonoventa].EstadoVenta = EstadoVenta.Pagada;
+                                                                    error = true;
+                                                                }
+                                                                else if (monto < creditos[IDcreditoAbono].Mtopendiente && monto > 0)
+                                                                {
+                                                                    if (DateTime.Now < creditos[IDcreditoAbono].FechaLimite) creditos[IDcreditoAbono].Estado = EstadoCredito.Activo;
+                                                                    creditos[IDcreditoAbono].Mtopendiente -= monto;
+                                                                    int IDabonoventa = creditos[IDcreditoAbono].VentaID;
+                                                                    ventas[IDabonoventa].Saldo -= monto;
+                                                                    ventas[IDabonoventa].EstadoVenta = EstadoVenta.Parcial;
+                                                                    ventas[IDabonoventa].Montopagado += monto;
+                                                                    error = true;
+                                                                }
+                                                                if (error)
+                                                                {
+                                                                    Pago p = new Pago(IDpago, IDc, monto);
+                                                                    pagos.Add(IDpago, p);
+                                                                    IDpago += 1;
+                                                                    error = true;
+                                                                    Console.ForegroundColor = ConsoleColor.Green;
+                                                                    Console.WriteLine("pago registrado con exito");
+                                                                    Console.ResetColor();
+                                                                    Presionar();
+                                                                }
+
+                                                            }
+                                                            catch (Exception ex)
+                                                            {
+                                                                ErrorCatch(ex);
+                                                            }
+                                                        } while (!error);
+                                                    }
+                                                    else
+                                                    {
+                                                        Console.ForegroundColor = ConsoleColor.Green;
+                                                        Console.WriteLine("Este credito no esta activo");
+                                                        error = true;
+                                                        Console.ResetColor();
+                                                        Presionar();
+                                                    }
                                                 }
                                                 else
                                                 {
-                                                    Console.ForegroundColor = ConsoleColor.Green;
-                                                    Console.WriteLine("Este credito no esta activo");
-                                                    error = true;
-                                                    Console.ResetColor();
-                                                    Presionar();
+                                                    error = false;
                                                 }
                                             }
                                             else
@@ -2158,15 +2142,94 @@ class Program
                         }
 
                         break;
+                    case "5":
+                        break;
+                    default:
+                        Console.WriteLine();
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("opcion no valida");
+                        Console.ResetColor();
+                        Presionar();
+                        Console.Clear();
+                        break;
                 }
                 Console.Clear();
             } while (opcion != "5");
         }
 
+        //
+        void SubMenuGastos()
+        {
+            do
+            {
+                Console.ForegroundColor= ConsoleColor.Blue;
+                Console.WriteLine("====Gastos====");
+                Console.ResetColor();
+                Console.WriteLine();
+                Console.WriteLine("1. registrar un gasto");
+                Console.WriteLine("2. Mostrar todos los gastos");
+                Console.WriteLine("3. Salir");
+                Console.WriteLine();
+                Console.Write("ingrese una opcion: ");
+                opcion = Console.ReadLine();
+                Console.Clear();
+                switch (opcion)
+                {
+                    case "1":
+                        do
+                        {
+                            Console.Write("Ingrese una descripcion del gasto: "); string descripcion = Console.ReadLine();
+                            double monto;
+                            do
+                            {
+                                Console.WriteLine();
+                                Console.Write("ingrese el monto: ");
+                                error = double.TryParse(Console.ReadLine(), out monto);
+                            } while (!error);
+
+                            try
+                            {
+                                Gasto g = new Gasto(IDgasto,descripcion,monto);
+                                gastos.Add(IDgasto, g);
+                                IDgasto += 1;
+                                Console.WriteLine();
+                                Console.ForegroundColor=ConsoleColor.Green;
+                                Console.WriteLine("gasto ingresado con exito");
+                                Console.ResetColor();
+                                Presionar();
+                            }
+                            catch(Exception ex)
+                            {
+                                ErrorCatch(ex);
+                            }
+                        } while (!error);
+                        break;
+                    case "2":
+                        Console.ForegroundColor= ConsoleColor.Blue;
+                        Console.WriteLine("===Todos los Gastos Registrados===");
+                        Console.ResetColor();
+                        Console.WriteLine();
+                        foreach(KeyValuePair<int,Gasto> g in gastos)
+                        {
+                            g.Value.MostrarGastos();
+                            Console.ForegroundColor= ConsoleColor.Blue;
+                            Console.WriteLine("=========================");
+                            Console.ResetColor();
+                        }
+                        Presionar();
+                        break;
+                }
+                Console.Clear();
+
+            } while (opcion != "3");
+        }
+
         //menu principal
         do
         {
+            Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("====MENU====");
+            Console.ResetColor();
             Console.WriteLine();
             Console.WriteLine("1. Productos");
             Console.WriteLine("2. Clientes");
@@ -2198,7 +2261,7 @@ class Program
                     SubmenuCreditos();
                     break;
                 case "5":
-
+                    SubMenuGastos();
                     break;
             }
         } while (opcion != "8");
