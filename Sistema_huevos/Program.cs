@@ -602,7 +602,11 @@ class Perdida
     public int Cantidad
     {
         get { return cantidad; }
-        set { cantidad = value; }
+        set 
+        {
+            if (value < 0) throw new Exception("la cantidad debe ser mayor o igual a cero");
+            else cantidad = value;
+        }
     }
     public double Costounitario
     {
@@ -623,6 +627,16 @@ class Perdida
     {
         get { return fecha; }
         set { fecha = value; }
+    }
+
+    public void MostrarPerdidas()
+    {
+        Console.WriteLine("ID de perdida: "+ID);
+        Console.WriteLine("ID del producto: "+ProductoID);
+        Console.WriteLine("Costo unitario al momento de la perdida: "+Costounitario);
+        Console.WriteLine("Total Perdido: "+TotalPerdido);
+        Console.WriteLine("Tipo de Perdida: "+TipoPerdida);
+        Console.WriteLine("fecha de registro: "+Fecha);
     }
 }
 
@@ -703,7 +717,7 @@ class Program
 
         //variables gobales, listas y diccionarios
         string opcion; bool error; int IDproducto = 1, IDcliente = 1; int IDventa = 1; int IDdetalleventa = 1; int IDcredito=1; int IDpago=1;
-        int IDgasto=1;
+        int IDgasto=1; int IDperdidas=1;
         Dictionary<int, Producto> productos = new Dictionary<int, Producto>();
         Dictionary<int, Cliente> clientes = new Dictionary<int, Cliente>();
         Dictionary<int, Venta> ventas = new Dictionary<int, Venta>();
@@ -711,7 +725,9 @@ class Program
         List<DetalleVenta> detalles = new List<DetalleVenta>();
         Dictionary<int,Pago> pagos = new Dictionary<int, Pago>();
         Dictionary<int, Gasto> gastos = new Dictionary<int, Gasto>();
-
+        Dictionary<int, Perdida> perdidas = new Dictionary<int, Perdida>();
+        
+        //recibe los errores del catch
         void ErrorCatch(Exception ex)
         {
             Console.WriteLine();
@@ -722,6 +738,17 @@ class Program
             Presionar();
             Console.Clear();
             error = false;
+        }
+
+        //opcion no valida en los case
+        void OpcionoValida()
+        {
+            Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("opcion no valida");
+            Console.ResetColor();
+            Presionar();
+            Console.Clear();
         }
         //submenuproductos
         void submenuProductos()
@@ -1057,12 +1084,7 @@ class Program
                                 case "3":
                                     break;
                                 default:
-                                    Console.WriteLine();
-                                    Console.ForegroundColor = ConsoleColor.Red;
-                                    Console.WriteLine("opcion no valida");
-                                    Console.ResetColor();
-                                    Presionar();
-                                    Console.Clear();
+                                    OpcionoValida();
                                     break;
                             }
                         } while (opcion != "3");
@@ -1302,12 +1324,7 @@ class Program
                                     case "4":
                                         break;
                                     default:
-                                        Console.WriteLine();
-                                        Console.ForegroundColor = ConsoleColor.Red;
-                                        Console.WriteLine("opcion no valida");
-                                        Console.ResetColor();
-                                        Presionar();
-
+                                        OpcionoValida();
                                         break;
                                 }
                                 Console.Clear();
@@ -1403,12 +1420,7 @@ class Program
                                 case "3":
                                     break;
                                 default:
-                                    Console.WriteLine();
-                                    Console.ForegroundColor = ConsoleColor.Red;
-                                    Console.WriteLine("opcion no valida");
-                                    Console.ResetColor();
-                                    Presionar();
-                                    Console.Clear();
+                                    OpcionoValida();
                                     break;
                             }
                         } while (opcion != "3");
@@ -1454,12 +1466,7 @@ class Program
                     case "6":
                         break;
                     default:
-                        Console.WriteLine();
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("opcion no valida");
-                        Console.ResetColor();
-                        Presionar();
-                        Console.Clear();
+                        OpcionoValida();
                         break;
                 }
             } while (opcion != "6");
@@ -1541,15 +1548,11 @@ class Program
                                         error = true;
                                         break;
                                     default:
-                                        Console.WriteLine();
-                                        Console.ForegroundColor = ConsoleColor.Red;
-                                        Console.WriteLine("opcion no valida");
-                                        Console.ResetColor();
-                                        Presionar();
-                                        Console.Clear();
+                                        OpcionoValida();
                                         error = false;
                                         break;
                                 }
+                                Console.Clear();
                             } while ((opcion != "1" && opcion != "2") || !error);
                             do
                             {
@@ -1846,12 +1849,7 @@ class Program
                     case "4":
                         break;
                     default:
-                        Console.WriteLine();
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("opcion no valida");
-                        Console.ResetColor();
-                        Presionar();
-                        Console.Clear();
+                        OpcionoValida();
                         break;
                 }
                 Console.Clear();
@@ -2069,7 +2067,7 @@ class Program
                                 {
                                     Console.WriteLine();
                                     Console.ForegroundColor = ConsoleColor.Yellow;
-                                    Console.WriteLine("Cliente no encontrado");
+                                    Console.WriteLine("el cliente es de tipo frecuente");
                                     error = true;
                                     Console.WriteLine();
                                     Presionar();
@@ -2080,7 +2078,7 @@ class Program
                             {
                                 Console.WriteLine();
                                 Console.ForegroundColor = ConsoleColor.Green;
-                                Console.WriteLine("el cliente no tiene creditos activos");
+                                Console.WriteLine("cliente no encontrado");
                                 error = true;
                                 Console.WriteLine();
                                 Presionar();
@@ -2224,6 +2222,170 @@ class Program
             } while (opcion != "3");
         }
 
+        //submenu Perdidas
+        void subMenuPerdidas()
+        {
+            do
+            {
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.WriteLine("===Perdidas===");
+                Console.ResetColor();
+                Console.WriteLine();
+                Console.WriteLine("1. Resgistrar Perdida");
+                Console.WriteLine("2. Ver todas las perdidas");
+                Console.WriteLine("3. Ver perdidas por producto");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("4. volver al menu");
+                Console.ResetColor();
+                Console.WriteLine();
+                Console.Write("Ingres una opcion: "); opcion = Console.ReadLine();
+                Console.Clear();
+                int idProducto=0;
+                switch (opcion)
+                {
+                    case "1":
+                        do
+                        {
+                            Console.Write("Ingrese ID del Producto: ");
+                            error = int.TryParse(Console.ReadLine(),out idProducto);
+                        } while (!error);
+
+                        if (productos.ContainsKey(idProducto))
+                        {
+                            do
+                            {
+                                Console.WriteLine();
+                                productos[idProducto].MostrarInfo();
+                                Console.WriteLine();
+                                int cantidad = 0;
+                                do
+                                {
+                                    Console.Write("Ingrese la cantidad de unidades dañadas: ");
+                                    error = int.TryParse(Console.ReadLine(), out cantidad);
+                                } while (!error);
+                                double costoUnitario = Math.Round(productos[idProducto].CostoUnitario / 30, 2);
+                                double totalPerdido = Math.Round(costoUnitario * cantidad,2);
+                                TipoPerdida tipoSeleccionado = TipoPerdida.Danado;
+                                do
+                                {
+                                    Console.WriteLine();
+                                    Console.ForegroundColor = ConsoleColor.Blue;
+                                    Console.WriteLine("===Seleccione el Tipo de perdida===");
+                                    Console.WriteLine();
+                                    Console.ResetColor();
+                                    Console.WriteLine("1. Roto");
+                                    Console.WriteLine("2. Vencido");
+                                    Console.WriteLine("3. Dañado");
+                                    Console.WriteLine("4. Otro");
+                                    Console.WriteLine();
+                                    Console.Write("ingrese opcion: "); opcion = Console.ReadLine();
+                                    switch (opcion)
+                                    {
+                                        case "1":
+                                            tipoSeleccionado = TipoPerdida.Roto;
+                                            break;
+                                        case "2":
+                                            tipoSeleccionado = TipoPerdida.Vencido;
+                                            break;
+                                        case "3":
+                                            tipoSeleccionado = TipoPerdida.Danado;
+                                            break;
+                                        case "4":
+                                            tipoSeleccionado = TipoPerdida.otro;
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                } while (opcion != "1" && opcion != "2" && opcion != "3" && opcion != "4");
+
+                                try
+                                {
+                                    Perdida p = new Perdida(IDperdidas,idProducto,cantidad,costoUnitario,totalPerdido,tipoSeleccionado);
+                                    perdidas.Add(IDperdidas,p);
+                                    IDperdidas += 1;
+                                    Console.WriteLine();
+                                    Console.ForegroundColor = ConsoleColor.Green;
+                                    Console.WriteLine("perdida registrada con exito");
+                                    Console.ResetColor();
+                                    Presionar();
+                                }catch(Exception ex)
+                                {
+                                    ErrorCatch(ex);
+                                }
+                            } while (!error);
+                        }
+                        else
+                        {
+                            Console.WriteLine();
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            Console.WriteLine("producto no encontrado");
+                            error = true;
+                            Console.WriteLine();
+                            Presionar();
+                            Console.Clear();
+                        }
+                        break;
+                    case "2":
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine("==todas las perdidas===");
+                        Console.ResetColor();
+                        Console.WriteLine();
+                        foreach(KeyValuePair<int,Perdida> p in perdidas)
+                        {
+                            p.Value.MostrarPerdidas();
+                            Console.ForegroundColor= ConsoleColor.Green;
+                            Console.WriteLine("==========================================");
+                            Console.ResetColor();
+                        }
+                        Presionar();
+                        break;
+                    case "3":
+                        do
+                        {
+                            Console.Write("Ingrese ID del Producto: ");
+                            error = int.TryParse(Console.ReadLine(), out idProducto);
+                        } while (!error);
+
+                        if (productos.ContainsKey(idProducto))
+                        {
+                            Console.WriteLine();
+                            Console.ForegroundColor=ConsoleColor.Green;
+                            Console.Write("nombre del producto: " + productos[idProducto].Nombre);
+                            Console.WriteLine();
+                            Console.ResetColor();
+                            foreach(KeyValuePair<int,Perdida> p in perdidas)
+                            {
+                                if (p.Value.ProductoID == idProducto)
+                                {
+                                    p.Value.MostrarPerdidas();
+                                }
+                            }
+                            Presionar();
+                        }
+                        else
+                        {
+                            Console.WriteLine();
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            Console.WriteLine("producto no encontrado");
+                            Console.WriteLine();
+                            Presionar();
+                        }
+                        break;
+                    case "4":
+                        break;
+                    default:
+                        OpcionoValida();
+                        break;
+                }
+                Console.Clear();
+            } while (opcion != "4");
+        }
+
+        void subMenuReportes()
+        {
+
+        }
+
         //menu principal
         do
         {
@@ -2262,6 +2424,17 @@ class Program
                     break;
                 case "5":
                     SubMenuGastos();
+                    break;
+                case "6":
+                    subMenuPerdidas();
+                    break;
+                case "7":
+                    subMenuReportes();
+                    break;
+                case "8":
+                    break;
+                default:
+                    OpcionoValida();
                     break;
             }
         } while (opcion != "8");
