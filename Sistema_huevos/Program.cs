@@ -651,7 +651,7 @@ class ReporteFinanciero
     private double perdidastotales;
     private double ganacias;
 
-    public ReporteFinanciero(DateTime fechaInicio, DateTime fechaFin, double totalVentas, double totalGastos, double totalPerdido, double totalCreditosVencidos)
+    public ReporteFinanciero(DateTime fechaInicio, DateTime fechaFin, double totalVentas, double totalGastos, double totalPerdido, double totalCreditosVencidos, double perdidastotales, double ganancias)
     {
         FechaInicio = fechaInicio;
         FechaFin = fechaFin;
@@ -659,6 +659,24 @@ class ReporteFinanciero
         TotalGastos = totalGastos;
         TotalPerdido = totalPerdido;
         TotalCreditosVencidos = totalCreditosVencidos;
+        PerdidasTotales = perdidastotales;
+        Ganacias = ganancias;
+    }
+
+    public void MostrarReporte()
+    {
+        Console.WriteLine("Inicio de Reporte: "+FechaInicio);
+        Console.WriteLine("Fin de Reporte: "+FechaFin);
+        Console.WriteLine("Total de ventas: "+TotalVentas);
+        Console.WriteLine("total de Gastos: "+TotalGastos);
+        Console.WriteLine("Total Perdidas: "+TotalPerdido);
+        Console.WriteLine("total Creditos vencidos: "+TotalCreditosVencidos);
+        Console.ForegroundColor= ConsoleColor.Red;
+        Console.WriteLine("Total de Perdidas: "+PerdidasTotales);
+        Console.ResetColor();
+        Console.ForegroundColor=ConsoleColor.Green;
+        Console.WriteLine("Ganancias: "+Ganacias);
+        Console.ResetColor();
     }
 
     public DateTime FechaInicio
@@ -691,7 +709,7 @@ class ReporteFinanciero
         get { return totalcreditosvencidos; }
         set { totalcreditosvencidos = value; }
     }
-    public double PerdidadTotales
+    public double PerdidasTotales
     {
         get { return perdidastotales; }
         set { perdidastotales = value; }
@@ -750,6 +768,7 @@ class Program
             Presionar();
             Console.Clear();
         }
+
         //submenuproductos
         void submenuProductos()
         {
@@ -2383,7 +2402,170 @@ class Program
 
         void subMenuReportes()
         {
+            do
+            {
+                double Totalventas = 0, totalGastos = 0, Totalperdida = 0, TotalCreditosVencidos = 0, totalPerdidas = 0, Ganancias = 0;
+                Console.ForegroundColor= ConsoleColor.Blue;
+                Console.WriteLine("===Reportes===");
+                Console.ResetColor();
+                Console.WriteLine();
+                Console.WriteLine("1. Reporte Financiero por fecha");
+                Console.WriteLine("2, Reporte de ventas");
+                Console.WriteLine("3. Reporte de creditos vencidos");
+                Console.WriteLine("4. Reporte de perdidas");
+                Console.WriteLine("5. Reporte de gastos");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("6. Salir");
+                Console.ResetColor();
+                Console.WriteLine();
+                Console.Write("Ingrese una opcion: "); opcion = Console.ReadLine();
+                Console.Clear();
+                switch (opcion)
+                {
+                    case "1":
 
+                        do
+                        {
+                            DateTime FechaInicio, FechaFin;
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            Console.WriteLine("Ingrese: Mes/dias/año");
+                            Console.ResetColor();
+                            Console.WriteLine();
+                            do
+                            {
+                                Console.Write("Ingrese Fecha de Inicio: ");
+                                error = DateTime.TryParse(Console.ReadLine(), out FechaInicio);
+                            } while (!error);
+
+                            Console.WriteLine();
+                            do
+                            {
+                                Console.Write("Ingrese Fecha de Fin: ");
+                                error = DateTime.TryParse(Console.ReadLine(), out FechaFin);
+                            } while (!error);
+
+
+                            foreach (KeyValuePair<int, Venta> v in ventas)
+                            {
+                                if (v.Value.Fecha.Date >= FechaInicio.Date && v.Value.Fecha.Date <= FechaFin.Date)
+                                {
+                                    Totalventas += v.Value.Montopagado;
+                                }
+                            }
+
+                            foreach (KeyValuePair<int, Gasto> g in gastos)
+                            {
+                                if (g.Value.Fecha.Date >= FechaInicio.Date && g.Value.Fecha.Date <= FechaFin.Date)
+                                {
+                                    totalGastos += g.Value.Monto;
+                                }
+                            }
+
+                            foreach (KeyValuePair<int, Perdida> p in perdidas)
+                            {
+                                if (p.Value.Fecha.Date >= FechaInicio.Date && p.Value.Fecha.Date <= FechaFin.Date)
+                                {
+                                    Totalperdida += p.Value.TotalPerdido;
+                                }
+                            }
+
+                            foreach (KeyValuePair<int, Credito> c in creditos)
+                            {
+                                if (c.Value.Estado == EstadoCredito.Vencido && (c.Value.Fechaotorgado.Date >= FechaInicio.Date && c.Value.Fechaotorgado.Date <= FechaFin.Date))
+                                {
+                                    TotalCreditosVencidos += c.Value.Mtopendiente;
+                                }
+                            }
+                            totalPerdidas = totalGastos + Totalperdida + TotalCreditosVencidos;
+                            Ganancias = Totalventas - totalPerdidas;
+
+                            try
+                            {
+                                ReporteFinanciero r = new ReporteFinanciero(FechaInicio,FechaFin,Totalventas,totalGastos,Totalperdida,TotalCreditosVencidos,totalPerdidas,Ganancias);
+                                Console.WriteLine();
+                                Console.ForegroundColor= ConsoleColor.Blue;
+                                Console.WriteLine("===Reporte en rango de fecha===");
+                                Console.ResetColor();
+                                r.MostrarReporte();
+                            }
+                            catch(Exception ex)
+                            {
+                                ErrorCatch(ex);
+                            }
+                        } while (!error);
+                        Presionar();
+                        break;
+                    case "2":
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine("===Total de ventas===");
+                        Console.WriteLine();
+                        Console.ResetColor();
+                        foreach (KeyValuePair<int, Venta> v in ventas)
+                        {
+                            Totalventas += v.Value.Montopagado;
+                        }
+                        Console.WriteLine();
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine("Total de ventas: "+Totalventas);
+                        Console.ResetColor();
+                        Presionar();
+                        break;
+                    case "3":
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine("===Total de Creditos Vencidos===");
+                        Console.WriteLine();
+                        Console.ResetColor();
+                        foreach (KeyValuePair<int,Credito> c in creditos)
+                        {
+                            if (c.Value.Estado == EstadoCredito.Vencido)
+                            {
+                                TotalCreditosVencidos += c.Value.Mtopendiente;
+                            }
+                        }
+                        Console.WriteLine();
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Total de Creditos Vencidos: " + TotalCreditosVencidos);
+                        Console.ResetColor();
+                        Presionar();
+                        break;
+                    case "4":
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine("===Total de Perdidas de producto===");
+                        Console.WriteLine();
+                        Console.ResetColor();
+                        foreach (KeyValuePair<int, Perdida> p in perdidas)
+                        {
+                            Totalperdida += p.Value.TotalPerdido;
+                        }
+                        Console.WriteLine();
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Total de perdidas de producto: " + Totalperdida);
+                        Console.ResetColor();
+                        Presionar();
+                        break;
+                    case "5":
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine("===Total de Gastos===");
+                        Console.WriteLine();
+                        Console.ResetColor();
+                        foreach (KeyValuePair<int, Gasto> g in gastos)
+                        {
+                            totalGastos += g.Value.Monto;
+                        }
+                        Console.WriteLine();
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Total de Gastos: " + totalGastos);
+                        Console.ResetColor();
+                        Presionar();
+                        break;
+                    case "6":
+                        break;
+                    default:
+                        OpcionoValida();
+                        break;
+                }
+                Console.Clear();
+            } while (opcion != "6");
         }
 
         //menu principal
