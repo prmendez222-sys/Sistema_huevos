@@ -1,4 +1,5 @@
 ﻿
+using System.Data.SQLite;
 using System.Runtime.CompilerServices;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -39,6 +40,358 @@ public enum EstadoVenta
     Pendiente
 }
 
+//base de datos
+class BaseDatos
+{
+    private static string conexion = "Data Source= huevos.db";
+
+    public static SQLiteConnection ObtenerConexion()
+    {
+        return new SQLiteConnection(conexion);
+    }
+
+    public static void CrearTablas()
+    {
+        using(var con = ObtenerConexion())
+        {
+            con.Open();
+            var cmd = con.CreateCommand();
+
+            cmd.CommandText = @"
+            CREATE TABLE IF NOT EXISTS Productos (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                Nombre TEXT NOT NULL,
+                CostoUnitario REAL NOT NULL,
+                CostoPorCaja REAL NOT NULL,
+                PrecioUnitario REAL NOT NULL,
+                PrecioPorCaja REAL NOT NULL,
+                UnidadesPorCaja INTEGER NOT NULL,
+                StockActual INTEGER NOT NULL,
+            );
+            CREATE TABLE IF NOT EXISTS Clientes (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                Nombre TEXT NOT NULL,
+                Telefono TEXT NOT NULL,
+                Tipo TEXT NOT NULL,
+                FechaRegistro TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS Ventas (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                Fecha TEXT NOT NULL,
+                ClienteId INTEGER,
+                Total REAL NOT NULL,
+                EsCredito INTEGER NOT NULL,
+                MontoPagado REAL NOT NULL,
+                Saldo REAL NOT NULL,
+                Estado TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS DetalleVenta (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                VentaId INTEGER NOT NULL,
+                ProductoId INTEGER NOT NULL,
+                Cantidad INTEGER NOT NULL,
+                PrecioUnitario REAL NOT NULL,
+                Subtotal REAL NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS Creditos (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                ClienteId INTEGER NOT NULL,
+                VentaId INTEGER NOT NULL,
+                MontoOriginal REAL NOT NULL,
+                MontoPendiente REAL NOT NULL,
+                FechaOtorgado TEXT NOT NULL,
+                FechaLimite TEXT NOT NULL,
+                Estado TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS Pagos (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                ClienteId INTEGER NOT NULL,
+                CreditoId INTEGER NOT NULL,
+                Monto REAL NOT NULL,
+                Fecha TEXT NOT NULL,
+            );
+            CREATE TABLE IF NOT EXISTS Gastos (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                Descripcion TEXT NOT NULL,
+                Monto REAL NOT NULL,
+                Fecha TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS Perdidas (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                ProductoId INTEGER NOT NULL,
+                Cantidad INTEGER NOT NULL,
+                CostoUnitario REAL NOT NULL,
+                TotalPerdido REAL NOT NULL,
+                Motivo TEXT NOT NULL,
+                Fecha TEXT NOT NULL,
+            );";
+
+            cmd.ExecuteNonQuery();
+        }
+    }
+
+    public static void InsertarProducto(Producto producto)
+    {
+        using (var con = ObtenerConexion())
+        {
+            con.Open();
+            var cmd = con.CreateCommand();
+
+            cmd.CommandText = @"INSERT INTO Productos 
+            (Nombre, CostoUnitario, CostoPorCaja, PrecioUnitario, 
+             PrecioPorCaja, UnidadesPorCaja, StockActual, 
+             GananciaPorUnidad, GananciaPorCaja)
+            VALUES 
+            (@Nombre, @CostoUnitario, @CostoPorCaja, @PrecioUnitario,
+             @PrecioPorCaja, @UnidadesPorCaja, @StockActual,
+             @GananciaPorUnidad, @GananciaPorCaja)";
+
+            cmd.Parameters.AddWithValue("@Nombre", producto.Nombre);
+            cmd.Parameters.AddWithValue("@CostoUnitario", producto.CostoUnitario);
+            cmd.Parameters.AddWithValue("@CostoPorCaja", producto.CostoPorCaja);
+            cmd.Parameters.AddWithValue("@PrecioUnitario", producto.PrecioUnitario);
+            cmd.Parameters.AddWithValue("@PrecioPorCaja", producto.PrecioporCaja);
+            cmd.Parameters.AddWithValue("@UnidadesPorCaja", producto.UnidadesPorCaja);
+            cmd.Parameters.AddWithValue("@StockActual", producto.Stockactual);
+
+            cmd.ExecuteNonQuery();
+        }
+    }
+
+    public static Dictionary<int, Producto> ObtenerProductos()
+    {
+        Dictionary<int, Producto> productos = new Dictionary<int, Producto>();
+
+        using (var con = ObtenerConexion())
+        {
+            con.Open();
+            var cmd = con.CreateCommand();
+            cmd.CommandText = "SELECT * FROM Productos";
+
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    Producto producto = new Producto();
+                    producto.ID = reader.GetInt32(0);
+                    producto.Nombre = reader.GetString(1);
+                    producto.CostoUnitario = reader.GetDouble(2);
+                    producto.CostoPorCaja = reader.GetDouble(3);
+                    producto.PrecioUnitario = reader.GetDouble(4);
+                    producto.PrecioporCaja = reader.GetDouble(5);
+                    producto.UnidadesPorCaja = reader.GetInt32(6);
+                    producto.Stockactual = reader.GetInt32(7);
+
+                    productos.Add(producto.ID, producto);
+                }
+            }
+        }
+
+        return productos;
+    }
+
+    public static void ActualizarStockProducto(int id, int nuevoStock)
+    {
+        using (var con = ObtenerConexion())
+        {
+            con.Open();
+            var cmd = con.CreateCommand();
+
+            cmd.CommandText = @"UPDATE Productos 
+                            SET StockActual = @StockActual 
+                            WHERE Id = @Id";
+
+            cmd.Parameters.AddWithValue("@StockActual", nuevoStock);
+            cmd.Parameters.AddWithValue("@Id", id);
+
+            cmd.ExecuteNonQuery();
+        }
+    }
+    public static Producto ObtenerProductoPorId(int id)
+    {
+        using (var con = ObtenerConexion())
+        {
+            con.Open();
+            var cmd = con.CreateCommand();
+
+            cmd.CommandText = "SELECT * FROM Productos WHERE Id = @Id";
+            cmd.Parameters.AddWithValue("@Id", id);
+
+            using (var reader = cmd.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    Producto producto = new Producto();
+                    producto.ID = reader.GetInt32(0);
+                    producto.Nombre = reader.GetString(1);
+                    producto.CostoUnitario = reader.GetDouble(2);
+                    producto.CostoPorCaja = reader.GetDouble(3);
+                    producto.PrecioUnitario = reader.GetDouble(4);
+                    producto.PrecioporCaja = reader.GetDouble(5);
+                    producto.UnidadesPorCaja = reader.GetInt32(6);
+                    producto.Stockactual = reader.GetInt32(7);
+                    return producto;
+                }
+            }
+        }
+        return null;
+    }
+
+    public static Producto ObtenerProductoPorNombre(string nombre)
+    {
+        using (var con = ObtenerConexion())
+        {
+            con.Open();
+            var cmd = con.CreateCommand();
+
+            cmd.CommandText = "SELECT * FROM Productos WHERE Nombre = @Nombre";
+            cmd.Parameters.AddWithValue("@Nombre", nombre);
+
+            using (var reader = cmd.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    Producto producto = new Producto();
+                    producto.ID = reader.GetInt32(0);
+                    producto.Nombre = reader.GetString(1);
+                    producto.CostoUnitario = reader.GetDouble(2);
+                    producto.CostoPorCaja = reader.GetDouble(3);
+                    producto.PrecioUnitario = reader.GetDouble(4);
+                    producto.PrecioporCaja = reader.GetDouble(5);
+                    producto.UnidadesPorCaja = reader.GetInt32(6);
+                    producto.Stockactual = reader.GetInt32(7);
+                    return producto;
+                }
+            }
+        }
+        return null;
+    }
+
+    // INSERT
+    public static void InsertarCliente(Cliente cliente)
+    {
+        using (var con = ObtenerConexion())
+        {
+            con.Open();
+            var cmd = con.CreateCommand();
+
+            cmd.CommandText = @"INSERT INTO Clientes 
+            (Nombre, Telefono, Direccion, Tipo, FechaRegistro)
+            VALUES 
+            (@Nombre, @Telefono, @Direccion, @Tipo, @FechaRegistro)";
+
+            cmd.Parameters.AddWithValue("@Nombre", cliente.Nombre);
+            cmd.Parameters.AddWithValue("@Telefono", cliente.Telefono);
+            cmd.Parameters.AddWithValue("@Tipo", cliente.Tipo.ToString());
+            cmd.Parameters.AddWithValue("@FechaRegistro", cliente.FechaRegistro.ToString("yyyy-MM-dd HH:mm:ss"));
+
+            cmd.ExecuteNonQuery();
+        }
+    }
+
+    // SELECT todos
+    public static Dictionary<int, Cliente> ObtenerClientes()
+    {
+        Dictionary<int, Cliente> clientes = new Dictionary<int, Cliente>();
+
+        using (var con = ObtenerConexion())
+        {
+            con.Open();
+            var cmd = con.CreateCommand();
+            cmd.CommandText = "SELECT * FROM Clientes";
+
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    Cliente cliente = new Cliente();
+                    cliente.ID = reader.GetInt32(0);
+                    cliente.Nombre = reader.GetString(1);
+                    cliente.Telefono = reader.GetInt32(0);
+                    cliente.Tipo = Enum.Parse<TipoCliente>(reader.GetString(4));
+                    cliente.FechaRegistro = DateTime.Parse(reader.GetString(5));
+
+                    clientes.Add(cliente.ID, cliente);
+                }
+            }
+        }
+        return clientes;
+    }
+
+    // SELECT por Id
+    public static Cliente ObtenerClientePorId(int id)
+    {
+        using (var con = ObtenerConexion())
+        {
+            con.Open();
+            var cmd = con.CreateCommand();
+            cmd.CommandText = "SELECT * FROM Clientes WHERE Id = @Id";
+            cmd.Parameters.AddWithValue("@Id", id);
+
+            using (var reader = cmd.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    Cliente cliente = new Cliente();
+                    cliente.ID = reader.GetInt32(0);
+                    cliente.Nombre = reader.GetString(1);
+                    cliente.Telefono = reader.GetInt32(0);
+                    cliente.Tipo = Enum.Parse<TipoCliente>(reader.GetString(4));
+                    cliente.FechaRegistro = DateTime.Parse(reader.GetString(5));
+                    return cliente;
+                }
+            }
+        }
+        return null;
+    }
+
+    // SELECT por Nombre
+    public static Cliente ObtenerClientePorNombre(string nombre)
+    {
+        using (var con = ObtenerConexion())
+        {
+            con.Open();
+            var cmd = con.CreateCommand();
+            cmd.CommandText = "SELECT * FROM Clientes WHERE Nombre = @Nombre";
+            cmd.Parameters.AddWithValue("@Nombre", nombre);
+
+            using (var reader = cmd.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    Cliente cliente = new Cliente();
+                    cliente.ID = reader.GetInt32(0);
+                    cliente.Nombre = reader.GetString(1);
+                    cliente.Telefono = reader.GetInt32(0);
+                    cliente.Tipo = Enum.Parse<TipoCliente>(reader.GetString(4));
+                    cliente.FechaRegistro = DateTime.Parse(reader.GetString(5));
+                    return cliente;
+                }
+            }
+        }
+        return null;
+    }
+
+    // UPDATE tipo de cliente
+    public static void ActualizarTipoCliente(int id, TipoCliente tipo)
+    {
+        using (var con = ObtenerConexion())
+        {
+            con.Open();
+            var cmd = con.CreateCommand();
+
+            cmd.CommandText = @"UPDATE Clientes 
+                            SET Tipo = @Tipo 
+                            WHERE Id = @Id";
+
+            cmd.Parameters.AddWithValue("@Tipo", tipo.ToString());
+            cmd.Parameters.AddWithValue("@Id", id);
+
+            cmd.ExecuteNonQuery();
+        }
+    }
+}
+
 //clases
 class Producto
 {
@@ -51,6 +404,7 @@ class Producto
     private int unidadesPorcaja;
     private int stockactual;
 
+    public Producto() { }
     public Producto(int id, string nombre, double costoUnitario, double precioUnitario)
     {
         ID = id;
@@ -164,7 +518,7 @@ class Cliente
     private int telefono;
     private TipoCliente tipo;
     private DateTime fecharegistro;
-
+    public Cliente() { }
     public Cliente(int iD, string nombre, int telefono, TipoCliente tipo)
     {
         ID = iD;
@@ -476,13 +830,15 @@ class Pago
 {
     private int id;
     private int clienteid;
+    private int creditoid;
     private double monto;
     private DateTime fecha;
 
-    public Pago(int iD, int clienteid, double monto)
+    public Pago(int iD, int clienteid, int creditoid, double monto)
     {
         ID = iD;
         Clienteid = clienteid;
+        Creditoid = creditoid;
         Monto = monto;
         Fecha = DateTime.Now;
     }
@@ -497,6 +853,12 @@ class Pago
     {
         get { return clienteid; }
         set { clienteid = value; }
+    }
+
+    public int Creditoid
+    {
+        get { return creditoid; }
+        set {  creditoid = value; }
     }
     public double Monto
     {
@@ -726,6 +1088,9 @@ class Program
 {
     static void Main()
     {
+        BaseDatos.ObtenerConexion();
+        BaseDatos.CrearTablas();
+
         void Presionar()
         {
             Console.WriteLine();
@@ -2033,7 +2398,7 @@ class Program
                                                                 }
                                                                 if (error)
                                                                 {
-                                                                    Pago p = new Pago(IDpago, IDc, monto);
+                                                                    Pago p = new Pago(IDpago, IDc, IDcreditoAbono, monto);
                                                                     pagos.Add(IDpago, p);
                                                                     IDpago += 1;
                                                                     error = true;
