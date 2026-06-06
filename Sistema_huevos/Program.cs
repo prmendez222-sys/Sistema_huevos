@@ -21,11 +21,6 @@ public enum EstadoCredito
     Pagado,
     Vencido
 }
-public enum FechaLimite
-{
-    quinceDias = 15,
-    treintaDias = 30
-}
 public enum TipoCliente
 {
     Frecuente,
@@ -976,12 +971,7 @@ class Program
                                         case "5":
                                             break;
                                         default:
-                                            Console.WriteLine();
-                                            Console.ForegroundColor = ConsoleColor.Red;
-                                            Console.WriteLine("opcion no valida");
-                                            Console.ResetColor();
-                                            Presionar();
-                                            Console.Clear();
+                                            OpcionoValida();
                                             break;
                                     }
                                 } while (sub3 != "5");
@@ -2410,7 +2400,7 @@ class Program
                 Console.ResetColor();
                 Console.WriteLine();
                 Console.WriteLine("1. Reporte Financiero por fecha");
-                Console.WriteLine("2, Reporte de ventas");
+                Console.WriteLine("2. Reporte de ventas");
                 Console.WriteLine("3. Reporte de creditos vencidos");
                 Console.WriteLine("4. Reporte de perdidas");
                 Console.WriteLine("5. Reporte de gastos");
